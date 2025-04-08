@@ -6,6 +6,6 @@ Some cool things could be done from this database, such as filtering for meals f
 
 
 ## Contributors
-- njriley@calpoly.edu
-- email2
-- email3
+- Nick Riley: njriley@calpoly.edu
+- Hudson Schmidt: hschmi06@calpoly.edu
+- James Hazelwood: hazelwoo@calpoly.edu
