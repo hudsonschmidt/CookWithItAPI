@@ -167,7 +167,7 @@ Retrieves macronutrient information for an ingredient.
 {
   "ingredient_id": "123"
 }
-
+```
 **Response**:
 ```json
 {
@@ -362,7 +362,7 @@ Creates a new food item composed of specified ingredients and their respective a
 }
 ```
 
-#### 2.4. Retrieve Recipe for Sharing - `/recipes/9907` (GET)
+#### 2.3. Retrieve Recipe for Sharing - `/recipes/9907` (GET)
 
 **Response**:
 ```json
