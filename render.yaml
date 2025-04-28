@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: central-coast-cauldrons
+    name: cook-with-it
     runtime: python
     plan: free
     autoDeploy: true
