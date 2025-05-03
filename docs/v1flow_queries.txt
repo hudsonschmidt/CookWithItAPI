@@ -1,0 +1,143 @@
+queries for cookwititapi:
+
+# Get select nutrients
+SELECT * FROM nutrient 
+WHERE name IN ('Protein', 'Energy', 'Carbohydrates', 'Total lipid (fat)')
+AND unit_name IN ('G', 'KCAL')
+LIMIT 10
+
+
+# Search Function postgres
+SELECT DISTINCT ON (f1.description) 
+       f1.description, 
+       (SELECT fdc_id 
+        FROM ingredient AS f2 
+        WHERE f2.description = f1.description 
+        ORDER BY publication_date DESC 
+        LIMIT 1) AS fdc_id,
+       fp.amount,
+       mu.name AS measure_unit_name
+FROM ingredient AS f1
+JOIN food_portion AS fp ON f1.fdc_id = fp.fdc_id
+JOIN measure_unit AS mu ON fp.measure_unit_id = mu.id
+WHERE f1.description LIKE '%Steak%'
+ORDER BY f1.description, f1.publication_date DESC
+LIMIT 10;
+
+
+# search in sqlite
+SELECT f1.description, 
+       (SELECT fdc_id 
+        FROM ingredient AS f2 
+        WHERE f2.description = f1.description 
+        ORDER BY publication_date DESC 
+        LIMIT 1) AS fdc_id,
+       fp.amount,
+       mu.name AS measure_unit_name
+FROM ingredient AS f1
+JOIN food_portion AS fp ON f1.fdc_id = fp.fdc_id
+JOIN measure_unit AS mu ON fp.measure_unit_id = mu.id
+WHERE f1.description LIKE '%Steak%'
+GROUP BY f1.description
+ORDER BY f1.publication_date DESC
+LIMIT 10;
+
+
+
+# User user ingredients table
+CREATE TABLE "user_ingredients" (
+  "fdc_id" INTEGER PRIMARY KEY,
+  "amount" INTEGER,
+  "description" TEXT,
+  "measure_unit_name" TEXT
+);
+
+
+
+INSERT INTO user_ingredients (fdc_id, amount, description, measure_unit_name)
+VALUES (2727573, 10, 'Beef, tenderloin steak, raw', 'steak');
+
+
+
+# Creation of recipe, recipe_amounts and food
+
+-- Table for Recipe
+CREATE TABLE "recipe" (
+    "id" INTEGER PRIMARY KEY,
+    "name" TEXT,
+    "steps" TEXT
+);
+
+-- Table for Food
+CREATE TABLE "food" (
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "meal_type" TEXT,
+    "name" TEXT,
+    "recipe_id" INTEGER,
+    "meal_id" INTEGER,
+    FOREIGN KEY ("recipe_id") REFERENCES "recipe"("id") ON DELETE SET NULL,
+    FOREIGN KEY ("meal_id") REFERENCES "meal"("id") ON DELETE CASCADE
+);
+
+
+-- Table for Recipe Amounts
+CREATE TABLE "recipe_amounts" (
+    "recipe_id" INTEGER,
+    "amount" INTEGER,
+    "ingredient_id" INTEGER,
+    FOREIGN KEY ("recipe_id") REFERENCES "recipe"("id"),
+    FOREIGN KEY ("ingredient_id") REFERENCES "ingredients"("fdc_id")
+);
+
+-- Table for Meal
+CREATE TABLE "meal" (
+    "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "meal_type" TEXT,
+    "date" DATE,
+    FOREIGN KEY ("foods") REFERENCES "food"("id") ON DELETE CASCADE
+);
+
+
+# Add scrambled eggs as a recipe
+INSERT INTO "recipe" (name, steps)
+VALUES ("Scrambled eggs", "Take egg out of carton. Scramble eggs");
+
+# Add eggs into the recipe
+INSERT INTO "recipe_amounts" (recipe_id, amount, ingredient_id)
+VALUES (1, 2, 748236);
+
+# Add a meal
+INSERT INTO "meal" (meal_type, date)
+VALUES ('Dinner', '2025-05-03');
+
+# Add scrambled eggs as a food object under a meal
+INSERT INTO "food" (meal_type, name, recipe_id, meal_id)
+VALUES ('Main Course', 'Beef Tenderloin Steak', 1, 1);
+
+# Query to get the amount of nutrients in a given meal
+SELECT 
+    nutrient.name AS nutrient_name,
+    SUM(ingredient_nutrient.amount) AS total_amount
+FROM 
+    meal
+JOIN 
+    food ON food.meal_id = meal.id
+JOIN 
+    recipe ON food.recipe_id = recipe.id
+JOIN 
+    recipe_amounts ON recipe_amounts.recipe_id = recipe.id
+JOIN 
+    ingredient_nutrient ON ingredient_nutrient.fdc_id = recipe_amounts.ingredient_id
+JOIN 
+    nutrient ON nutrient.id = ingredient_nutrient.nutrient_id
+WHERE 
+    meal.id = 1  -- Specify the meal ID you want to query
+    AND nutrient.name IN ('Protein', 'Energy', 'Carbohydrates', 'Total lipid (fat)')
+    AND nutrient.unit_name IN ('G', 'KCAL')
+GROUP BY 
+    nutrient.name
+ORDER BY 
+    nutrient.name;
+
+
+
