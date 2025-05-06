@@ -14,12 +14,7 @@ Adds an ingredient to the user's personal ingredient list. Post ingredient_id mu
 }
 ```
 
-**Response**:
-```json
-{
-  "message": "Ingredient added successfully."
-}
-```
+**Response**: `204 No Content`
 
 ### 1.2. Get Ingredients - `/user-ingredients` (GET)
 
