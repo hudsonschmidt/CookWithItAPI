@@ -261,9 +261,7 @@ Creates a new food item composed of specified ingredients and their respective a
 
 **Response**:
 ```json
-{
-  "message": "Ingredient added successfully."
-}
+204 NO CONTENT
 ```
 
 #### 1.3. Create a Food Item (Eggs) - `/food` (POST)
