@@ -17,6 +17,10 @@ class Ingredient(BaseModel):
     name: str
     measure_unit: str
 
+class UserIngredient(BaseModel):
+    ingredient_id: int
+    name: str
+
 
 class SearchResponse(BaseModel):
     results: List[Ingredient]
@@ -43,8 +47,6 @@ def search_ingredients(search_term: str):
             {"search_term": f"%{search_term}%"},
         ).fetchall()
 
-        print(foods)
-
         food_list: List[Ingredient] = []
         for food in foods:
             food_list.append(
@@ -59,7 +61,7 @@ def search_ingredients(search_term: str):
 
 
 @router.post("/user-ingredients/", status_code=status.HTTP_204_NO_CONTENT)
-def add_ingredient_by_id(ingredient_id: int, amount: int):
+def add_ingredient_by_id(ingredient: UserIngredient):
     with db.engine.begin() as connection:
         connection.execute(
             sqlalchemy.text(
@@ -78,5 +80,5 @@ def add_ingredient_by_id(ingredient_id: int, amount: int):
                 LIMIT 1;
                 """
             ),
-            {"ingredient_id": ingredient_id, "amount": amount},
+            {"ingredient_id": ingredient.ingredient_id, "amount": ingredient.amount},
         )
