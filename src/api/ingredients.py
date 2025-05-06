@@ -6,54 +6,77 @@ from src import database as db
 from typing import List
 
 router = APIRouter(
-    prefix="/inventory",
-    tags=["inventory"],
+    prefix="/ingredients",
+    tags=["ingredients"],
     dependencies=[Depends(auth.get_api_key)],
 )
 
 
 class Ingredient(BaseModel):
-    ingredient_id: str
+    ingredient_id: int
     name: str
+    measure_unit: str
+
 
 class SearchResponse(BaseModel):
     results: List[Ingredient]
 
+
 @router.get("/search/", response_model=SearchResponse)
-def search_ingredients():
+def search_ingredients(search_term: str):
     with db.engine.begin() as connection:
         foods = connection.execute(
             sqlalchemy.text(
                 """
-                SELECT DISTINCT ON (ingredients.description) 
-                ingredients.description, 
-                (SELECT fdc_id 
-                    FROM ingredients 
-                    WHERE ingredients.description = ingredients.description 
-                    ORDER BY publication_date DESC 
-                    LIMIT 1) AS fdc_id,
-                fp.amount,
-                mu.name AS measure_unit_name
-                FROM ingredients AS ingredients
+                SELECT DISTINCT ON (ingredients.description)
+                ingredients.fdc_id,
+                ingredients.description,
+                mu.name AS measure_unit
+                FROM ingredients
                 JOIN food_portion AS fp ON ingredients.fdc_id = fp.fdc_id
                 JOIN measure_unit AS mu ON fp.measure_unit_id = mu.id
-                WHERE ingredients.description LIKE '%Steak%'
+                WHERE ingredients.description ILIKE :search_term
                 ORDER BY ingredients.description, ingredients.publication_date DESC
                 LIMIT 10;
                 """
-            )
+            ),
+            {"search_term": f"%{search_term}%"},
         ).fetchall()
 
         print(foods)
 
         food_list: List[Ingredient] = []
-
         for food in foods:
-            food_list.append(Ingredient(ingredient_id=1, name="food"))
+            food_list.append(
+                Ingredient(
+                    ingredient_id=food.fdc_id,
+                    name=food.description,
+                    measure_unit=food.measure_unit,
+                )
+            )
 
-        return food_list
+        return SearchResponse(results=food_list)
 
 
-    
-print(search_ingredients())
-    
+@router.post("/user-ingredients/", status_code=status.HTTP_204_NO_CONTENT)
+def add_ingredient_by_id(ingredient_id: int, amount: int):
+    with db.engine.begin() as connection:
+        connection.execute(
+            sqlalchemy.text(
+                """
+                INSERT INTO user_ingredients (fdc_id, amount, description, measure_unit_name)
+                SELECT 
+                    ingredients.fdc_id,
+                    :amount AS amount,
+                    ingredients.description,
+                    mu.name AS measure_unit_name
+                FROM ingredients
+                JOIN food_portion AS fp ON ingredients.fdc_id = fp.fdc_id
+                JOIN measure_unit AS mu ON fp.measure_unit_id = mu.id
+                WHERE ingredients.fdc_id = :ingredient_id
+                ORDER BY fp.amount DESC
+                LIMIT 1;
+                """
+            ),
+            {"ingredient_id": ingredient_id, "amount": amount},
+        )

@@ -1,5 +1,14 @@
 from fastapi import FastAPI
-from src.api import carts, catalog, bottler, barrels, admin, info, inventory
+from src.api import (
+    carts,
+    catalog,
+    bottler,
+    barrels,
+    admin,
+    info,
+    inventory,
+    ingredients,
+)
 from starlette.middleware.cors import CORSMiddleware
 
 description = """
@@ -15,6 +24,10 @@ tags_metadata = [
     },
     {"name": "admin", "description": "Where you reset the game state."},
     {"name": "info", "description": "Get updates on time"},
+    {
+        "name": "ingredients",
+        "description": "See ingredients to make recipes out of.",
+    },
     {
         "name": "inventory",
         "description": "Get the current inventory of shop and buying capacity.",
@@ -44,6 +57,7 @@ app.add_middleware(
 )
 
 app.include_router(inventory.router)
+app.include_router(ingredients.router)
 app.include_router(carts.router)
 app.include_router(catalog.router)
 app.include_router(bottler.router)
