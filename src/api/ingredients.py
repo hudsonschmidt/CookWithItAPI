@@ -17,6 +17,7 @@ class Ingredient(BaseModel):
     name: str
     measure_unit: str
 
+
 class UserIngredient(BaseModel):
     ingredient_id: int
     name: str

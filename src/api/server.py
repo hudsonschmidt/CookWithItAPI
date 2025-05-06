@@ -8,6 +8,9 @@ from src.api import (
     info,
     inventory,
     ingredients,
+    food,
+    recipes,
+    meals
 )
 from starlette.middleware.cors import CORSMiddleware
 
@@ -27,6 +30,18 @@ tags_metadata = [
     {
         "name": "ingredients",
         "description": "See ingredients to make recipes out of.",
+    },
+    {
+        "name": "recipes",
+        "description": "Recipe with steps and ingredeients.",
+    },
+    {
+        "name": "meals",
+        "description": "A meal houses foods per a given day and meal type.",
+    },
+    {
+        "name": "food",
+        "description": "Food is an object which is an instance of a recipe.",
     },
     {
         "name": "inventory",
@@ -58,6 +73,9 @@ app.add_middleware(
 
 app.include_router(inventory.router)
 app.include_router(ingredients.router)
+app.include_router(food.router)
+app.include_router(recipes.router)
+app.include_router(meals.router)
 app.include_router(carts.router)
 app.include_router(catalog.router)
 app.include_router(bottler.router)
