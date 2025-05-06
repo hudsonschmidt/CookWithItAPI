@@ -63,14 +63,14 @@ VALUES (2727573, 10, 'Beef, tenderloin steak, raw', 'steak');
 
 -- Table for Recipe
 CREATE TABLE "recipe" (
-    "id" SERIAL  PRIMARY KEY,
+    "id" SERIAL PRIMARY KEY,
     "name" TEXT,
     "steps" TEXT
 );
 
 -- Table for Food
 CREATE TABLE "food" (
-    "id" SERIAL INTEGER PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL PRIMARY KEY AUTOINCREMENT,
     "meal_type" TEXT,
     "name" TEXT,
     "recipe_id" INTEGER,
@@ -91,7 +91,7 @@ CREATE TABLE "recipe_amounts" (
 
 -- Table for Meal
 CREATE TABLE "meal" (
-    "id" SERIAL INTEGER PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL PRIMARY KEY AUTOINCREMENT,
     "meal_type" TEXT,
     "date" DATE,
     FOREIGN KEY ("foods") REFERENCES "food"("id") ON DELETE CASCADE
