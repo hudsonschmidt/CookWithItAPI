@@ -255,53 +255,69 @@ Creates a new food item composed of specified ingredients and their respective a
 ```
 
 **Response**:
-```json
-204 NO CONTENT
-```
+`204 NO CONTENT`
 
-#### 1.3. Create a Food Item (Eggs) - `/food` (POST)
-
-**Request**:
+#### 1.4. Create a Recipe (Eggs) - `/recipes` (POST)
 ```json
 {
-  "ingredients": {
-    "123": 5,   // Egg ID: Amount
-  }
+  "name": "Scrambled Eggs",
+  "steps": "Crack open eggs, scramble",
+  "ingredients": [
+    {
+      "ingredient_id": 123,
+      "amount": 6
+    }
+  ]
 }
 ```
 
 **Response**:
 ```json
 {
-  "food_id": "501",
-  "name": "Eggs",
-  "macros": {
-    "protein": "30g",
-    "carbs": "5g",
-    "fats": "25g"
-  }
+  recipe_id: 100
 }
 ```
 
-#### 1.4. Log Breakfast Meal - `/meals` (POST)
+#### 1.5. Create a meal - `/meals` (POST)
 
 **Request**:
 ```json
 {
-  "foods": [{ "food_id": "501", "amount": "2" }],
-  "mealtime": "breakfast"
+  "meal_type": "Dinner",
+  "date": "2025-05-03"
 }
 ```
 
 **Response**:
 ```json
 {
-  "meal_id": "365",
-  "message": "Meal logged successfully."
+  meal_id: 523
 }
 ```
 
-#### 1.5. View Macros for the Meal - `/meals/365/macros` (GET)
+#### 1.6. Log food under meal - `/food` (POST)
+
+**Request**:
+```json
+{
+  "name": "Scrambled Eggs with Sauce",
+  "recipe_id": 100,
+  "meal_id": 523
+}
+```
+
+**Response**:`204 NO CONTENT`
+
+#### 1.7. View Macros for the Meal - `/meals/365/macros` (GET)
+
+**Request**:
+```json
+{
+  "meal_id": 525
+}
+
+```
+
 
 **Response**:
 ```json
