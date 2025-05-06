@@ -258,7 +258,7 @@ Creates a new food item composed of specified ingredients and their respective a
 `204 NO CONTENT`
 
 #### 1.4. Create a Recipe (Eggs) - `/recipes` (POST)
-
+```json
 {
   "name": "Scrambled Eggs",
   "steps": "Crack open eggs, scramble",
@@ -269,6 +269,14 @@ Creates a new food item composed of specified ingredients and their respective a
     }
   ]
 }
+```
+
+**Response**:
+```json
+{
+  recipe_id: 100
+}
+```
 
 #### 1.5. Create a meal - `/meals` (POST)
 
@@ -293,7 +301,7 @@ Creates a new food item composed of specified ingredients and their respective a
 ```json
 {
   "name": "Scrambled Eggs with Sauce",
-  "recipe_id": 31,
+  "recipe_id": 100,
   "meal_id": 523
 }
 ```
