@@ -278,24 +278,8 @@ Creates a new food item composed of specified ingredients and their respective a
 }
 ```
 
-#### 1.5. Create a meal - `/meals` (POST)
 
-**Request**:
-```json
-{
-  "meal_type": "Dinner",
-  "date": "2025-05-03"
-}
-```
-
-**Response**:
-```json
-{
-  meal_id: 523
-}
-```
-
-#### 1.6. Log food under meal - `/food` (POST)
+#### 1.6. Create a meal - `/meals` (POST)
 
 **Request**:
 ```json
@@ -308,7 +292,21 @@ Creates a new food item composed of specified ingredients and their respective a
 
 **Response**:`204 NO CONTENT`
 
-#### 1.7. View Macros for the Meal - `/meals/365/macros` (GET)
+#### 1.7. Associate recipes with a meal - `/meals/recipes/` (POST)
+
+**Request**:
+```json
+{
+  "recipes": [
+      431: 5, # RecipeId: Amount
+  
+  ]
+}
+```
+
+**Response**:`204 NO CONTENT`
+
+#### 1.8. View Macros for the Meal - `/meals/macros` (GET)
 
 **Request**:
 ```json
@@ -322,7 +320,6 @@ Creates a new food item composed of specified ingredients and their respective a
 **Response**:
 ```json
 {
-  "meal_id": "801",
   "macros": {
     "protein": "60g",
     "carbs": "10g",
