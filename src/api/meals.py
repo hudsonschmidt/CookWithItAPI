@@ -1,36 +1,54 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 import sqlalchemy
 from src.api import auth
+from enum import Enum
+from typing import List, Optional
 from src import database as db
-from typing import List
 
 router = APIRouter(
-    prefix="/meals",
-    tags=["meals"],
+    prefix="/carts",
+    tags=["cart"],
     dependencies=[Depends(auth.get_api_key)],
 )
 
+class MealCreateResponse(BaseModel):
+    meal_id: int
+
+class Food(BaseModel):
+    food_id: int
+    amount: int
 
 class Meal(BaseModel):
     meal_type: str
     date: str
 
-class MealResponse(BaseModel):
-    meal_id: int
-
-
-@router.post("/", response_model=MealResponse)
-def create_meal(meal: Meal):
+@router.post("/", response_model=MealCreateResponse)
+def create_meal(foods: List[Food], mealtime: str):
+    """
+    Creates a new meal with given foods and mealtime.
+    """
     with db.engine.begin() as connection:
         meal_id = connection.execute(
             sqlalchemy.text(
                 """
-                INSERT INTO meal (meal_type, date)
-                VALUES (:meal_type, :date);
+                INSERT INTO meal (mealtime, date)
+                VALUES (:mealtime, now())
+                RETURNING id
                 """
             ),
-            {"meal_type": meal.meal_type, "date": meal.date},
-        ).scalar_one()
+            {"mealtime": mealtime},
+        ).scalar()
 
-        return MealResponse(meal_id=meal_id)
+        for food in foods:
+            connection.execute(
+                sqlalchemy.text(
+                    """
+                    INSERT INTO meal_foods (meal_id, food_id)
+                    VALUES (:meal_id, :food_id)
+                    """
+                ),
+                {"meal_id": meal_id, "food_id": food.food_id},
+            )
+
+    return MealCreateResponse(meal_id=meal_id)
