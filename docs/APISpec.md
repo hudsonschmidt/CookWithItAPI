@@ -292,15 +292,16 @@ Creates a new food item composed of specified ingredients and their respective a
 
 **Response**:`204 NO CONTENT`
 
-#### 1.5. Associate recipes with a meal - `/meals/recipes/` (POST)
+#### 1.5. Create a meal and associate with a recipe - `/meals/recipes/` (POST)
 
 **Request**:
 ```json
 {
   "recipes": [
-      431: 5, # RecipeId: Amount
-  
-  ]
+    { "recipe_id": "123", "amount": "2" },
+    { "recipe_id": "456", "amount": "1" }
+  ],
+  "mealtime": "lunch"
 }
 ```
 
