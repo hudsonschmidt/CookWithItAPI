@@ -278,20 +278,6 @@ Creates a new food item composed of specified ingredients and their respective a
 }
 ```
 
-
-#### 1.4. Create a meal - `/meals` (POST)
-
-**Request**:
-```json
-{
-  "name": "Scrambled Eggs with Sauce",
-  "recipe_id": 100,
-  "meal_id": 523
-}
-```
-
-**Response**:`204 NO CONTENT`
-
 #### 1.5. Create a meal and associate with a recipe - `/meals/recipes/` (POST)
 
 **Request**:
@@ -305,7 +291,12 @@ Creates a new food item composed of specified ingredients and their respective a
 }
 ```
 
-**Response**:`204 NO CONTENT`
+**Response**:
+```json
+{
+  meal_id: 525
+}
+```
 
 #### 1.6. View Macros for the Meal - `/meals/macros` (GET)
 
