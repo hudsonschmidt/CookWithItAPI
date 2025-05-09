@@ -312,12 +312,20 @@ Creates a new food item composed of specified ingredients and their respective a
 **Response**:
 ```json
 {
-  "macros": {
-    "protein": "60g",
-    "carbs": "10g",
-    "fats": "50g",
-    "calories": "140kcal"
-  }
+  "macro_list": [
+    {
+      "macro_name": "Energy",
+      "total_amount": 668
+    },
+    {
+      "macro_name": "Protein",
+      "total_amount": 32.4
+    },
+    {
+      "macro_name": "Total lipid (fat)",
+      "total_amount": 57.6
+    }
+  ]
 }
 ```
 
