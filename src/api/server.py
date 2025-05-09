@@ -8,7 +8,6 @@ from src.api import (
     info,
     inventory,
     ingredients,
-    food,
     recipes,
     meals
 )
@@ -40,10 +39,6 @@ tags_metadata = [
         "description": "A meal houses foods per a given day and meal type.",
     },
     {
-        "name": "food",
-        "description": "Food is an object which is an instance of a recipe.",
-    },
-    {
         "name": "inventory",
         "description": "Get the current inventory of shop and buying capacity.",
     },
@@ -73,7 +68,6 @@ app.add_middleware(
 
 app.include_router(inventory.router)
 app.include_router(ingredients.router)
-app.include_router(food.router)
 app.include_router(recipes.router)
 app.include_router(meals.router)
 app.include_router(carts.router)

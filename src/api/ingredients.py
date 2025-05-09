@@ -20,7 +20,7 @@ class Ingredient(BaseModel):
 
 class UserIngredient(BaseModel):
     ingredient_id: int
-    name: str
+    amount: int
 
 
 class SearchResponse(BaseModel):
