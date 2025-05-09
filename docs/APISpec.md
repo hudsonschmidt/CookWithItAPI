@@ -283,11 +283,11 @@ Creates a new food item composed of specified ingredients and their respective a
 **Request**:
 ```json
 {
+  "mealtime": "lunch",
   "recipes": [
     { "recipe_id": "123", "amount": "2" },
     { "recipe_id": "456", "amount": "1" }
-  ],
-  "mealtime": "lunch"
+  ]
 }
 ```
 
