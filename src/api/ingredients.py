@@ -33,15 +33,17 @@ def search_ingredients(search_term: str):
         foods = connection.execute(
             sqlalchemy.text(
                 """
-                SELECT DISTINCT ON (ingredients.description)
-                ingredients.fdc_id,
-                ingredients.description,
-                mu.name AS measure_unit
-                FROM ingredients
-                JOIN food_portion AS fp ON ingredients.fdc_id = fp.fdc_id
-                JOIN measure_unit AS mu ON fp.measure_unit_id = mu.id
-                WHERE ingredients.description ILIKE :search_term
-                ORDER BY ingredients.description, ingredients.publication_date DESC
+                SELECT DISTINCT ON (i.description) i.fdc_id, i.description, mu.name AS measure_unit
+                FROM ingredients AS i
+
+                JOIN food_portion AS fp 
+                ON fp.fdc_id = i.fdc_id
+
+                JOIN measure_unit AS mu 
+                ON mu.id = fp.measure_unit_id
+
+                WHERE i.description ILIKE '%' || :search_term || '%'
+                ORDER BY i.description, i.publication_date DESC
                 LIMIT 10;
                 """
             ),

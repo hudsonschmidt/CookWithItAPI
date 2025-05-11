@@ -28,6 +28,7 @@ class MealCreateRequest(BaseModel):
 
 
 class Meal(BaseModel):
+    id: int
     meal_type: str
     date: str
 
@@ -118,3 +119,34 @@ def get_marcos(meal_id: int):
         ]
 
     return MacroResponse(macro_list=nutrients)
+
+class SearchResponse(BaseModel):
+    results: List[Meal]
+
+@router.get("/history/", response_model=SearchResponse)
+def meal_history(start: str, end: str):
+    with db.engine.begin() as connection:
+        meals = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT id, mealtime, date
+                FROM meal
+
+                WHERE date BETWEEN :start AND :end
+                ORDER BY date DESC
+                """
+            ),
+            {"start": f"%{start}%", "end": f"%{end}%"},
+        ).fetchall()
+
+        meal_list: List[Meal] = []
+        for meal in meals:
+            meal_list.append(
+                Meal(
+                    id=meal.id,
+                    meal_type=meal.mealtime,
+                    date=meal.date.strftime("%Y-%m-%d %H:%M:%S"),
+                )
+            )
+
+        return SearchResponse(results=meal_list)
