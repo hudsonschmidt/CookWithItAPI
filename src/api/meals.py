@@ -145,7 +145,7 @@ def meal_history(start: str, end: str):
                 Meal(
                     id=meal.id,
                     meal_type=meal.mealtime,
-                    date=meal.date.strftime("%Y-%m-%d %H:%M:%S"),
+                    date=meal.date,
                 )
             )
 
