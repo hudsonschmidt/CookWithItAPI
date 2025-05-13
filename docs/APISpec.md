@@ -283,9 +283,9 @@ Creates a new food item composed of specified ingredients and their respective a
 **Request**:
 ```json
 {
-  "mealtime": "lunch",
+  "mealtime": "breakfast",
   "recipes": [
-    { "recipe_id": "123", "amount": "2" },
+    { "recipe_id": "123", "amount": "1" },
     { "recipe_id": "456", "amount": "1" }
   ]
 }
@@ -431,16 +431,5 @@ Creates a new food item composed of specified ingredients and their respective a
 {
   "meal_id": "912",
   "macros": { "protein": "28g", "carbs": "45g", "fats": "18g" }
-}
-```
-
-#### 3.4. Review Client Pantry - `/user-ingredients` (GET)
-
-**Response**:
-```json
-{
-  "ingredients": [
-    { "uiid": "123", "name": "Eggs", "quantity": 10, "Measurement": "Item" }
-  ]
 }
 ```
