@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, Path
 from pydantic import BaseModel, Field
 import sqlalchemy
 from src.api import auth
@@ -17,6 +17,12 @@ class Ingredient(BaseModel):
     name: str
     measure_unit: str
 
+class IngredientAmount(BaseModel):
+    ingredient_id: int
+    name: str
+    measure_unit: str
+    amount: int
+
 
 class UserIngredient(BaseModel):
     ingredient_id: int
@@ -25,6 +31,10 @@ class UserIngredient(BaseModel):
 
 class SearchResponse(BaseModel):
     results: List[Ingredient]
+
+
+class IngredientAmounts(BaseModel):
+    results: List[IngredientAmount]
 
 
 @router.get("/search/", response_model=SearchResponse)
@@ -63,25 +73,63 @@ def search_ingredients(search_term: str):
         return SearchResponse(results=food_list)
 
 
-@router.post("/user-ingredients/", status_code=status.HTTP_204_NO_CONTENT)
-def add_ingredient_by_id(ingredient: UserIngredient):
+@router.post("/{user_id}/add-ingredients/", status_code=status.HTTP_204_NO_CONTENT)
+def add_ingredient_by_id(ingredient: UserIngredient, user_id: int = Path(...)):
     with db.engine.begin() as connection:
         connection.execute(
             sqlalchemy.text(
                 """
-                INSERT INTO user_ingredients (fdc_id, amount, description, measure_unit_name)
-                SELECT 
-                    ingredients.fdc_id,
-                    :amount AS amount,
-                    ingredients.description,
-                    mu.name AS measure_unit_name
-                FROM ingredients
-                JOIN food_portion AS fp ON ingredients.fdc_id = fp.fdc_id
-                JOIN measure_unit AS mu ON fp.measure_unit_id = mu.id
-                WHERE ingredients.fdc_id = :ingredient_id
-                ORDER BY fp.amount DESC
-                LIMIT 1;
+                INSERT INTO user_ingredients (user_id, fdc_id, amount)
+                VALUES(:user_id, :fdc_id, :amount)
                 """
             ),
-            {"ingredient_id": ingredient.ingredient_id, "amount": ingredient.amount},
+            {"user_id": user_id, "fdc_id": ingredient.ingredient_id, "amount": ingredient.amount},
+        )
+
+
+@router.get("/{user_id}/get-ingredients/")
+def get_user_ingredients(user_id: int = Path(...)):
+    with db.engine.begin() as connection:
+        user_ingredients = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT 
+                    SUM(ui.amount) AS amount, 
+                    i.fdc_id, 
+                    i.description AS name, 
+                    mu.name AS measure_unit
+                FROM user_ingredients ui
+                JOIN ingredients i ON ui.fdc_id = i.fdc_id
+                JOIN food_portion fp ON fp.fdc_id = i.fdc_id
+                JOIN measure_unit mu ON fp.measure_unit_id = mu.id
+                WHERE ui.user_id = :user_id
+                GROUP BY i.fdc_id, i.description, mu.name
+                """
+            ), {"user_id": user_id}
+        ).fetchall()
+
+        ingredient_list: List[IngredientAmount] = []
+        for ingredient in user_ingredients:
+            ingredient_list.append(
+                IngredientAmount(
+                    ingredient_id=ingredient.fdc_id,
+                    name=ingredient.name,
+                    measure_unit=ingredient.measure_unit,
+                    amount=ingredient.amount,
+                )
+            )
+
+        return IngredientAmounts(results=ingredient_list)
+
+@router.delete("/{user_id}/remove-ingredients/", status_code=status.HTTP_204_NO_CONTENT)
+def add_ingredient_by_id(ingredient: UserIngredient, user_id: int = Path(...)):
+    with db.engine.begin() as connection:
+        connection.execute(
+            sqlalchemy.text(
+                """
+                INSERT INTO user_ingredients (user_id, fdc_id, amount)
+                VALUES(:user_id, :fdc_id, :amount)
+                """
+            ),
+            {"user_id": user_id, "fdc_id": ingredient.ingredient_id, "amount": -1 * ingredient.amount},
         )
