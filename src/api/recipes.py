@@ -47,7 +47,7 @@ def search_ingredients(recipe_id: int = Path(...)):
         recipe = connection.execute(
             sqlalchemy.text(
                 """
-                SELECT r.name AS rname, r.steps, i.fdc_id, i.description AS iname, ra.amount, mu.name AS measuring_unit
+                SELECT DISTINCT r.name AS rname, r.steps, i.fdc_id, i.description AS iname, ra.amount, mu.name AS measuring_unit
                 FROM recipe AS r
                 JOIN recipe_amounts AS ra ON r.id = ra.recipe_id 
                 JOIN ingredients AS i ON ra.ingredient_id = i.fdc_id
@@ -58,7 +58,7 @@ def search_ingredients(recipe_id: int = Path(...)):
             ),{"recipe_id": recipe_id}
         ).fetchall()
 
-        ingredient_list: List[IngredientNameAmount] = []
+        ingredient_list: List[IngredientInfo] = []
         for ingredient in recipe:
             ingredient_list.append(
                 IngredientInfo(
