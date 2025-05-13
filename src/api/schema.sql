@@ -117,3 +117,34 @@ INSERT INTO ingredient_nutrient (
 (748967, 1004, 9.96, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 
+-- Insert black beans
+INSERT INTO ingredients (fdc_id, data_type, description, food_category_id, publication_date) VALUES
+(739546, 'foundation_food', 'BLACK BEANS, CANNED', 1, '2019-12-16');
+
+INSERT INTO measure_unit (id, name) VALUES
+(1100, 'can');
+
+INSERT INTO food_portion (id, fdc_id, seq_num, amount, measure_unit_id, portion_description, modifier, gram_weight, data_points, footnote, min_year_acquired)
+VALUES (1100, 739546, 1, 1, 1100, NULL, NULL, 256, NULL, NULL, 2019);
+
+
+-- Insert onions
+INSERT INTO ingredients (fdc_id, data_type, description, food_category_id, publication_date) VALUES
+(739562, 'foundation_food', 'ONION, WHOLE', 1, '2019-12-16');
+
+INSERT INTO measure_unit (id, name) VALUES
+(1101, 'piece');
+
+INSERT INTO food_portion (id, fdc_id, seq_num, amount, measure_unit_id, portion_description, modifier, gram_weight, data_points, footnote, min_year_acquired)
+VALUES (1101, 739562, 1, 1, 1101, NULL, NULL, 110, NULL, NULL, 2019);
+
+-- Insert ground beef
+INSERT INTO ingredients (fdc_id, data_type, description, food_category_id, publication_date) VALUES
+(385662, 'foundation_food', 'GROUND BEEF', 1, '2019-12-16');
+
+INSERT INTO measure_unit (id, name) VALUES
+(1102, 'package');
+
+INSERT INTO food_portion (id, fdc_id, seq_num, amount, measure_unit_id, portion_description, modifier, gram_weight, data_points, footnote, min_year_acquired)
+VALUES (1102, 385662, 1, 1, 1102, NULL, NULL, 454, NULL, NULL, 2019);
+
