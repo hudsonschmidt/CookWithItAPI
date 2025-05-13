@@ -12,8 +12,8 @@ Response
 {
   "results": [
     {
-      "ingredient_id": 748218,
-      "name": "EGGS, GRADE A, LARGE",
+      "ingredient_id": 748967,
+      "name": "EGGS, GRADE A, LARGE, egg whole",
       "measure_unit": "egg"
     }
   ]
@@ -27,7 +27,7 @@ curl -X 'POST' \
   -H 'accept: */*' \
   -H 'Content-Type: application/json' \
   -d '{
-  "ingredient_id": 748218,
+  "ingredient_id": 748967,
   "amount": 10
 }'
   ```
@@ -47,7 +47,7 @@ curl -X 'POST' \
   "steps": "Crack open eggs, scramble",
   "ingredients": [
     {
-      "ingredient_id": 748218,
+      "ingredient_id": 748967,
       "amount": 6
     }
   ]
