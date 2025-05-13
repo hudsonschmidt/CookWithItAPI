@@ -49,8 +49,6 @@ app.add_middleware(
 app.include_router(ingredients.router)
 app.include_router(recipes.router)
 app.include_router(meals.router)
-app.include_router(admin.router)
-
 
 @app.get("/")
 async def root():

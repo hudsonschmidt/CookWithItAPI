@@ -1,2 +1,3 @@
-default/.env
 **/__pycache__/
+*.pyc
+default.env
