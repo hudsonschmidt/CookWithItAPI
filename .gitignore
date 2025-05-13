@@ -2,3 +2,7 @@ __pycache__/
 *.pyc
 default.env
 uv.lock
+__pycache__/
+*.pyc
+default.env
+uv.lock
