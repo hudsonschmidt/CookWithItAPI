@@ -95,7 +95,25 @@ INSERT INTO public.food_portion (id, fdc_id, seq_num, amount, measure_unit_id, p
 VALUES (1099, 748967, 1, 1, 1099, NULL, 'whole without shell', 50.3, 526, NULL, 2019);
 
 
-INSERT INTO ingredient_nutrient (fdc_id, nutrient_id, amount) VALUES
-(748967, 1008, 148),
-(748967, 1003, 12.4),
-(748967, 1004, 9.96);
+INSERT INTO nutrient (id, name, unit_name, nutrient_nbr, rank) VALUES
+(1008, 'Energy', 'KCAL', NULL, NULL),
+(1003, 'Protein', 'G', NULL, NULL),
+(1004, 'Total lipid (fat)', 'G', NULL, NULL);
+
+INSERT INTO ingredient_nutrient (
+    fdc_id,
+    nutrient_id,
+    amount,
+    data_points,
+    derivation_id,
+    min,
+    max,
+    median,
+    footnote,
+    min_year_acquired
+) VALUES
+(748967, 1008, 148, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(748967, 1003, 12.4, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+(748967, 1004, 9.96, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+
+
