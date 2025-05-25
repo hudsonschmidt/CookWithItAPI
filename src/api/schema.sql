@@ -1,5 +1,5 @@
 CREATE TABLE public.food_portion (
-	id int4 NULL PRIMARY KEY,
+	id int4 NOT NULL PRIMARY KEY,
 	fdc_id int4 NULL,
 	seq_num float4 NULL CHECK (seq_num >= 0),
 	amount float4 NULL CHECK (amount >= 0),
@@ -15,7 +15,7 @@ CREATE TABLE public.food_portion (
 
 
 CREATE TABLE public.ingredient_nutrient (
-	id int4 NULL PRIMARY KEY,
+	id int4 NOT NULL PRIMARY KEY,
 	fdc_id int4 NULL,
 	nutrient_id int4 NULL,
 	amount float4 NULL CHECK (amount >= 0),
@@ -62,12 +62,12 @@ CREATE TABLE public.meal_recipes (
 );
 
 CREATE TABLE public.measure_unit (
-	id int4 NULL PRIMARY KEY,
+	id int4 NOT NULL PRIMARY KEY,
 	"name" text NULL
 );
 
 CREATE TABLE public.nutrient (
-	id int4 NULL PRIMARY KEY,
+	id int4 NOT NULL PRIMARY KEY,
 	"name" text NULL,
 	unit_name text NULL,
 	nutrient_nbr float4 NULL,
@@ -75,13 +75,13 @@ CREATE TABLE public.nutrient (
 );
 
 CREATE TABLE public.recipe_amounts (
-	recipe_id int4 NULL,
+	recipe_id int4 NOT NULL,
 	amount int4 NULL CHECK (amount >= 0),
 	ingredient_id int4 NULL
 );
 
 CREATE TABLE public.user_ingredients (
-	fdc_id int4 NULL PRIMARY KEY,
+	fdc_id int4 NOT NULL PRIMARY KEY,
 	amount int4 NULL CHECK (amount >= 0),
 	description text NULL,
 	measure_unit_name text NULL
