@@ -33,7 +33,7 @@ CREATE TABLE public.ingredients (
 	data_type text NULL,
 	description text NULL,
 	food_category_id float4 NULL CHECK (food_category_id >= 0),
-	publication_date text NULL,
+	publication_date date NULL,
 	CONSTRAINT ingredients_pkey PRIMARY KEY (fdc_id)
 );
 
