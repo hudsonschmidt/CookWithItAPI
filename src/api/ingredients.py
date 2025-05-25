@@ -135,5 +135,5 @@ def remove_ingredient(ingredient: UserIngredient, user_id: int = Path(...)):
                 VALUES(:user_id, :fdc_id, :amount)
                 """
             ),
-            {"user_id": user_id, "fdc_id": ingredient.ingredient_id, "amount": -1 * ingredient.amount},
+            {"user_id": user_id, "fdc_id": ingredient.ingredient_id, "amount": -ingredient.amount},
         )

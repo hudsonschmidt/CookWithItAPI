@@ -28,7 +28,7 @@ class MealCreateRequest(BaseModel):
 
 
 class Meal(BaseModel):
-    id: int
+    meal_id: int
     meal_type: str
     date: str
 
@@ -40,6 +40,10 @@ class MacroAmount(BaseModel):
 
 class MacroResponse(BaseModel):
     macro_list: List[MacroAmount]
+
+
+class SearchResponse(BaseModel):
+    results: List[Meal]
 
 
 @router.post("/", response_model=MealCreateResponse)
@@ -77,7 +81,7 @@ def create_meal(meal: MealCreateRequest):
 @router.get("/macros", response_model=MacroResponse)
 def get_marcos(meal_id: int):
     """
-    Creates a new meal with given foods and mealtime.
+    Returns all the macronutrients for a given meal.
     """
     with db.engine.begin() as connection:
         # Returns the combined total macronutrients for a given meal
@@ -123,11 +127,11 @@ def get_marcos(meal_id: int):
 
     return MacroResponse(macro_list=nutrients)
 
-class SearchResponse(BaseModel):
-    results: List[Meal]
-
 @router.get("/history/", response_model=SearchResponse)
 def meal_history(start: str, end: str):
+    """
+    Queries all meals logged from date range given start to end.
+    """
     with db.engine.begin() as connection:
         # Query meal by date
         meals = connection.execute(
