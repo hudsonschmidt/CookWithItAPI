@@ -1,6 +1,5 @@
 CREATE TABLE public.food_portion (
 	id int4 NOT NULL PRIMARY KEY,
-	fdc_id int4 NULL,
 	seq_num float4 NULL CHECK (seq_num >= 0),
 	amount float4 NULL CHECK (amount >= 0),
 	measure_unit_id int4 NULL,
@@ -16,7 +15,6 @@ CREATE TABLE public.food_portion (
 
 CREATE TABLE public.ingredient_nutrient (
 	id int4 NOT NULL PRIMARY KEY,
-	fdc_id int4 NULL,
 	nutrient_id int4 NULL,
 	amount float4 NULL CHECK (amount >= 0),
 	data_points float4 NULL CHECK (data_points >= 0),
@@ -29,12 +27,12 @@ CREATE TABLE public.ingredient_nutrient (
 );
 
 CREATE TABLE public.ingredients (
-	fdc_id int4 NOT NULL PRIMARY KEY,
+	id int4 NOT NULL PRIMARY KEY,
 	data_type text NULL,
 	description text NULL,
 	food_category_id float4 NULL CHECK (food_category_id >= 0),
 	publication_date date NULL,
-	CONSTRAINT ingredients_pkey PRIMARY KEY (fdc_id)
+	CONSTRAINT ingredients_pkey PRIMARY KEY (id)
 );
 
 
@@ -85,7 +83,7 @@ CREATE TABLE public.recipe_amounts (
 );
 
 CREATE TABLE public.user_ingredients (
-	fdc_id int4 NOT NULL PRIMARY KEY,
+	id int4 NOT NULL PRIMARY KEY,
 	amount int4 NULL CHECK (amount >= 0),
 	"description" text NULL,
 	measure_unit_name text NULL,
@@ -94,13 +92,13 @@ CREATE TABLE public.user_ingredients (
 
 
 
-INSERT INTO ingredients (fdc_id, data_type, description, food_category_id, publication_date) VALUES
+INSERT INTO ingredients (id, data_type, description, food_category_id, publication_date) VALUES
 (748967, 'foundation_food', 'EGGS, GRADE A, LARGE, egg whole', 1, '2019-12-16');
 
 INSERT INTO measure_unit (id, name) VALUES
 (1099, 'egg')
 
-INSERT INTO public.food_portion (id, fdc_id, seq_num, amount, measure_unit_id, portion_description, modifier, gram_weight, data_points, footnote, min_year_acquired)
+INSERT INTO public.food_portion (id, seq_num, amount, measure_unit_id, portion_description, modifier, gram_weight, data_points, footnote, min_year_acquired)
 VALUES (1099, 748967, 1, 1, 1099, NULL, 'whole without shell', 50.3, 526, NULL, 2019);
 
 
@@ -110,7 +108,7 @@ INSERT INTO nutrient (id, name, unit_name, nutrient_nbr, rank) VALUES
 (1004, 'Total lipid (fat)', 'G', NULL, NULL);
 
 INSERT INTO ingredient_nutrient (
-    fdc_id,
+    id,
     nutrient_id,
     amount,
     data_points,
@@ -127,33 +125,33 @@ INSERT INTO ingredient_nutrient (
 
 
 -- Insert black beans
-INSERT INTO ingredients (fdc_id, data_type, description, food_category_id, publication_date) VALUES
+INSERT INTO ingredients (id, data_type, description, food_category_id, publication_date) VALUES
 (739546, 'foundation_food', 'BLACK BEANS, CANNED', 1, '2019-12-16');
 
 INSERT INTO measure_unit (id, name) VALUES
 (1100, 'can');
 
-INSERT INTO food_portion (id, fdc_id, seq_num, amount, measure_unit_id, portion_description, modifier, gram_weight, data_points, footnote, min_year_acquired)
-VALUES (1100, 739546, 1, 1, 1100, NULL, NULL, 256, NULL, NULL, 2019);
+INSERT INTO food_portion (id, seq_num, amount, measure_unit_id, portion_description, modifier, gram_weight, data_points, footnote, min_year_acquired)
+VALUES (739546, 1, 1, 1100, NULL, NULL, 256, NULL, NULL, 2019);
 
 
 -- Insert onions
-INSERT INTO ingredients (fdc_id, data_type, description, food_category_id, publication_date) VALUES
+INSERT INTO ingredients (id, data_type, description, food_category_id, publication_date) VALUES
 (739562, 'foundation_food', 'ONION, WHOLE', 1, '2019-12-16');
 
 INSERT INTO measure_unit (id, name) VALUES
 (1101, 'piece');
 
-INSERT INTO food_portion (id, fdc_id, seq_num, amount, measure_unit_id, portion_description, modifier, gram_weight, data_points, footnote, min_year_acquired)
-VALUES (1101, 739562, 1, 1, 1101, NULL, NULL, 110, NULL, NULL, 2019);
+INSERT INTO food_portion (id, seq_num, amount, measure_unit_id, portion_description, modifier, gram_weight, data_points, footnote, min_year_acquired)
+VALUES (739562, 1, 1, 1101, NULL, NULL, 110, NULL, NULL, 2019);
 
 -- Insert ground beef
-INSERT INTO ingredients (fdc_id, data_type, description, food_category_id, publication_date) VALUES
+INSERT INTO ingredients (id, data_type, description, food_category_id, publication_date) VALUES
 (385662, 'foundation_food', 'GROUND BEEF', 1, '2019-12-16');
 
 INSERT INTO measure_unit (id, name) VALUES
 (1102, 'package');
 
-INSERT INTO food_portion (id, fdc_id, seq_num, amount, measure_unit_id, portion_description, modifier, gram_weight, data_points, footnote, min_year_acquired)
-VALUES (1102, 385662, 1, 1, 1102, NULL, NULL, 454, NULL, NULL, 2019);
+INSERT INTO food_portion (id, seq_num, amount, measure_unit_id, portion_description, modifier, gram_weight, data_points, footnote, min_year_acquired)
+VALUES (385662, 1, 1, 1102, NULL, NULL, 454, NULL, NULL, 2019);
 
