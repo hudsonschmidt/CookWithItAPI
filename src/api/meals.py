@@ -42,7 +42,7 @@ class MacroResponse(BaseModel):
     macro_list: List[MacroAmount]
 
 
-class SearchResponse(BaseModel):
+class MealSearchResponse(BaseModel):
     results: List[Meal]
 
 
@@ -127,7 +127,7 @@ def get_marcos(meal_id: int):
 
     return MacroResponse(macro_list=nutrients)
 
-@router.get("/history/", response_model=SearchResponse)
+@router.get("/history/", response_model=MealSearchResponse)
 def meal_history(start: str, end: str):
     """
     Queries all meals logged from date range given start to end.
@@ -158,4 +158,4 @@ def meal_history(start: str, end: str):
                 )
             )
 
-        return SearchResponse(results=meal_list)
+        return MealSearchResponse(results=meal_list)

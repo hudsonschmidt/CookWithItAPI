@@ -29,7 +29,7 @@ class UserIngredient(BaseModel):
     amount: int
 
 
-class SearchResponse(BaseModel):
+class IngredientSearchResponse(BaseModel):
     results: List[Ingredient]
 
 
@@ -37,7 +37,7 @@ class IngredientAmounts(BaseModel):
     results: List[IngredientAmount]
 
 
-@router.get("/search/", response_model=SearchResponse)
+@router.get("/search/", response_model=IngredientSearchResponse)
 def search_ingredients(search_term: str):
     with db.engine.begin() as connection:
         # Get all food items that a relevant to the search term
@@ -72,7 +72,7 @@ def search_ingredients(search_term: str):
                 )
             )
 
-        return SearchResponse(results=food_list)
+        return IngredientSearchResponse(results=food_list)
 
 
 @router.post("/{user_id}/add-ingredients/", status_code=status.HTTP_204_NO_CONTENT)
