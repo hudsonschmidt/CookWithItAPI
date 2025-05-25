@@ -1,5 +1,5 @@
 CREATE TABLE public.food_portion (
-	id int4 NULL,
+	id int4 NULL PRIMARY KEY,
 	fdc_id int4 NULL,
 	seq_num float4 NULL CHECK (seq_num >= 0),
 	amount float4 NULL CHECK (amount >= 0),
@@ -9,12 +9,13 @@ CREATE TABLE public.food_portion (
 	gram_weight float4 NULL CHECK (gram_weight >= 0),
 	data_points float4 NULL CHECK (data_points >= 0),
 	footnote float4 NULL,
-	min_year_acquired float4 NULL CHECK (min_year_acquired >= 0)
+	min_year_acquired float4 NULL CHECK (min_year_acquired >= 0),
+	PRIMARY KEY id
 );
 
 
 CREATE TABLE public.ingredient_nutrient (
-	id int4 NULL,
+	id int4 NULL PRIMARY KEY,
 	fdc_id int4 NULL,
 	nutrient_id int4 NULL,
 	amount float4 NULL CHECK (amount >= 0),
@@ -28,7 +29,7 @@ CREATE TABLE public.ingredient_nutrient (
 );
 
 CREATE TABLE public.ingredients (
-	fdc_id int4 NOT NULL,
+	fdc_id int4 NOT NULL PRIMARY KEY,
 	data_type text NULL,
 	description text NULL,
 	food_category_id float4 NULL CHECK (food_category_id >= 0),
@@ -45,7 +46,7 @@ CREATE TABLE public.meal (
 );
 
 CREATE TABLE public.recipe (
-	id serial4 NOT NULL,
+	id serial4 NOT NULL PRIMARY KEY,
 	"name" text NULL,
 	steps text NULL,
 	CONSTRAINT recipe_pkey PRIMARY KEY (id)
@@ -61,12 +62,12 @@ CREATE TABLE public.meal_recipes (
 );
 
 CREATE TABLE public.measure_unit (
-	id int4 NULL,
+	id int4 NULL PRIMARY KEY,
 	"name" text NULL
 );
 
 CREATE TABLE public.nutrient (
-	id int4 NULL,
+	id int4 NULL PRIMARY KEY,
 	"name" text NULL,
 	unit_name text NULL,
 	nutrient_nbr float4 NULL,
@@ -80,7 +81,7 @@ CREATE TABLE public.recipe_amounts (
 );
 
 CREATE TABLE public.user_ingredients (
-	fdc_id int4 NULL,
+	fdc_id int4 NULL PRIMARY KEY,
 	amount int4 NULL CHECK (amount >= 0),
 	description text NULL,
 	measure_unit_name text NULL
