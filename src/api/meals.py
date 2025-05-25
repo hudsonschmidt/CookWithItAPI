@@ -54,7 +54,7 @@ def create_meal(meal: MealCreateRequest):
         meal_id = connection.execute(
             sqlalchemy.text(
                 """
-                INSERT INTO meal (mealtime, date)
+                INSERT INTO meals (mealtime, date)
                 VALUES (:mealtime, now())
                 RETURNING id
                 """
@@ -91,9 +91,9 @@ def get_macros(meal_id: int):
                 nutrient.name AS nutrient_name,
                 SUM(ingredient_nutrient.amount) AS total_amount
                 FROM 
-                    meal
+                    meals
                 JOIN 
-                    meal_recipes ON meal_recipes.meal_id = meal.id
+                    meal_recipes ON meal_recipes.meal_id = meals.id
                 JOIN 
                     recipe ON recipe.id = meal_recipes.recipe_id
                 JOIN 
@@ -137,7 +137,7 @@ def meal_history(start: str, end: str):
             sqlalchemy.text(
                 """
                 SELECT id, mealtime, date
-                FROM meal
+                FROM meals
 
                 WHERE date BETWEEN :start AND :end
                 ORDER BY date DESC

@@ -49,7 +49,7 @@ def search_ingredients(recipe_id: int = Path(...)):
             sqlalchemy.text(
                 """
                 SELECT DISTINCT r.name AS rname, r.steps, i.fdc_id, i.description AS iname, ra.amount, mu.name AS measuring_unit
-                FROM recipe AS r
+                FROM recipes AS r
                 JOIN recipe_amounts AS ra ON r.id = ra.recipe_id 
                 JOIN ingredients AS i ON ra.ingredient_id = i.fdc_id
                 JOIN food_portion AS fp ON fp.fdc_id = i.fdc_id
@@ -80,7 +80,7 @@ def create_recipe(recipe: Recipe):
         result = connection.execute(
             sqlalchemy.text(
                 """
-                INSERT INTO recipe (name, steps)
+                INSERT INTO recipes (name, steps)
                 VALUES (:name, :steps)
                 RETURNING id;
                 """
