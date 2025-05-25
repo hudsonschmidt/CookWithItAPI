@@ -44,6 +44,7 @@ class RecipeResponse(BaseModel):
 @router.get("/search/{recipe_id}", response_model=RecipeTotals)
 def search_ingredients(recipe_id: int = Path(...)):
     with db.engine.begin() as connection:
+        # Get ingredients from a given recipe
         recipe = connection.execute(
             sqlalchemy.text(
                 """
@@ -58,6 +59,7 @@ def search_ingredients(recipe_id: int = Path(...)):
             ),{"recipe_id": recipe_id}
         ).fetchall()
 
+        # Return list of ingredients
         ingredient_list: List[IngredientInfo] = []
         for ingredient in recipe:
             ingredient_list.append(
@@ -86,10 +88,10 @@ def create_recipe(recipe: Recipe):
         )
         recipe_id = result.scalar_one()
 
-        print("RECID", recipe_id)
-
+        # Insert all ingredients into the given recipe
         data = []
         for ingredient in recipe.ingredients_list:
+            # Prepare parameters for use in sql statement
             data.append({
                 "recipe_id": recipe_id,
                 "amount": ingredient.amount,

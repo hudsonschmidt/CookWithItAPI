@@ -40,6 +40,7 @@ class IngredientAmounts(BaseModel):
 @router.get("/search/", response_model=SearchResponse)
 def search_ingredients(search_term: str):
     with db.engine.begin() as connection:
+        # Get all food items that a relevant to the search term
         foods = connection.execute(
             sqlalchemy.text(
                 """
@@ -60,6 +61,7 @@ def search_ingredients(search_term: str):
             {"search_term": f"%{search_term}%"},
         ).fetchall()
 
+        # Create page of all returned ingredients
         food_list: List[Ingredient] = []
         for food in foods:
             food_list.append(
@@ -90,6 +92,7 @@ def add_ingredient_by_id(ingredient: UserIngredient, user_id: int = Path(...)):
 @router.get("/{user_id}/get-ingredients/")
 def get_user_ingredients(user_id: int = Path(...)):
     with db.engine.begin() as connection:
+        # Gets all the ingredients in the users pantry
         user_ingredients = connection.execute(
             sqlalchemy.text(
                 """
@@ -108,6 +111,7 @@ def get_user_ingredients(user_id: int = Path(...)):
             ), {"user_id": user_id}
         ).fetchall()
 
+        # Create listing of all ingredients
         ingredient_list: List[IngredientAmount] = []
         for ingredient in user_ingredients:
             ingredient_list.append(

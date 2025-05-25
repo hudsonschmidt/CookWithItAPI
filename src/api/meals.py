@@ -59,6 +59,7 @@ def create_meal(meal: MealCreateRequest):
             {"mealtime": meal.mealtime},
         ).scalar()
 
+        # Add all recipes that were created with the meal
         for recipe in meal.recipes:
             connection.execute(
                 sqlalchemy.text(
@@ -79,6 +80,7 @@ def get_marcos(meal_id: int):
     Creates a new meal with given foods and mealtime.
     """
     with db.engine.begin() as connection:
+        # Returns the combined total macronutrients for a given meal
         rows = connection.execute(
             sqlalchemy.text(
                 """
@@ -110,6 +112,7 @@ def get_marcos(meal_id: int):
             {"meal_id": meal_id},
         )
 
+        # Returns list of macros
         nutrients = [
             MacroAmount(
                 macro_name=row.nutrient_name,
@@ -126,6 +129,7 @@ class SearchResponse(BaseModel):
 @router.get("/history/", response_model=SearchResponse)
 def meal_history(start: str, end: str):
     with db.engine.begin() as connection:
+        # Query meal by date
         meals = connection.execute(
             sqlalchemy.text(
                 """
@@ -139,6 +143,7 @@ def meal_history(start: str, end: str):
             {"start": f"%{start}%", "end": f"%{end}%"},
         ).fetchall()
 
+        # Return meals within date range
         meal_list: List[Meal] = []
         for meal in meals:
             meal_list.append(
