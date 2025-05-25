@@ -126,7 +126,7 @@ def get_user_ingredients(user_id: int = Path(...)):
         return IngredientAmounts(results=ingredient_list)
 
 @router.delete("/{user_id}/remove-ingredients/", status_code=status.HTTP_204_NO_CONTENT)
-def add_ingredient_by_id(ingredient: UserIngredient, user_id: int = Path(...)):
+def remove_ingredient(ingredient: UserIngredient, user_id: int = Path(...)):
     with db.engine.begin() as connection:
         connection.execute(
             sqlalchemy.text(
