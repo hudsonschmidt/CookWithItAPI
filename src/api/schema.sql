@@ -77,7 +77,8 @@ CREATE TABLE public.nutrient (
 CREATE TABLE public.recipe_amounts (
 	recipe_id int4 NOT NULL,
 	amount int4 NULL CHECK (amount >= 0),
-	ingredient_id int4 NULL
+	ingredient_id int4 NULL,
+	CONSTRAINT fk_recipe FOREIGN KEY (recipe_id) REFERENCES public.recipe(id)
 );
 
 CREATE TABLE public.user_ingredients (
