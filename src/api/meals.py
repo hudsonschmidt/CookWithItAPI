@@ -1,9 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, Field
+from fastapi import APIRouter, Depends
+from pydantic import BaseModel
 import sqlalchemy
 from src.api import auth
-from enum import Enum
-from typing import List, Optional
+from typing import List
 from src import database as db
 
 router = APIRouter(
@@ -79,7 +78,7 @@ def create_meal(meal: MealCreateRequest):
 
 
 @router.get("/macros", response_model=MacroResponse)
-def get_marcos(meal_id: int):
+def get_macros(meal_id: int):
     """
     Returns all the macronutrients for a given meal.
     """
