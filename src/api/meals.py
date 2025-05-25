@@ -99,7 +99,7 @@ def get_macros(meal_id: int):
                 JOIN 
                     recipe_amounts ON recipe_amounts.recipe_id = recipe.id
                 JOIN 
-                    ingredient_nutrient ON ingredient_nutrient.fdc_id = recipe_amounts.ingredient_id
+                    ingredient_nutrient ON ingredient_nutrient.id = recipe_amounts.ingredient_id
                 JOIN 
                     nutrient ON nutrient.id = ingredient_nutrient.nutrient_id
                 WHERE 

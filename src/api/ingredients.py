@@ -44,11 +44,11 @@ def search_ingredients(search_term: str):
         foods = connection.execute(
             sqlalchemy.text(
                 """
-                SELECT DISTINCT ON (i.description) i.fdc_id, i.description, mu.name AS measure_unit
+                SELECT DISTINCT ON (i.description) i.id, i.description, mu.name AS measure_unit
                 FROM ingredients AS i
 
                 JOIN food_portion AS fp 
-                ON fp.fdc_id = i.fdc_id
+                ON fp.id = i.id
 
                 JOIN measure_unit AS mu 
                 ON mu.id = fp.measure_unit_id
@@ -66,7 +66,7 @@ def search_ingredients(search_term: str):
         for food in foods:
             food_list.append(
                 Ingredient(
-                    ingredient_id=food.fdc_id,
+                    ingredient_id=food.id,
                     name=food.description,
                     measure_unit=food.measure_unit,
                 )
@@ -81,11 +81,11 @@ def add_ingredient_by_id(ingredient: UserIngredient, user_id: int = Path(...)):
         connection.execute(
             sqlalchemy.text(
                 """
-                INSERT INTO user_ingredients (user_id, fdc_id, amount)
-                VALUES(:user_id, :fdc_id, :amount)
+                INSERT INTO user_ingredients (user_id, id, amount)
+                VALUES(:user_id, :id, :amount)
                 """
             ),
-            {"user_id": user_id, "fdc_id": ingredient.ingredient_id, "amount": ingredient.amount},
+            {"user_id": user_id, "id": ingredient.ingredient_id, "amount": ingredient.amount},
         )
 
 
@@ -98,15 +98,15 @@ def get_user_ingredients(user_id: int = Path(...)):
                 """
                 SELECT 
                     SUM(ui.amount) AS amount, 
-                    i.fdc_id, 
+                    i.id, 
                     i.description AS name, 
                     mu.name AS measure_unit
                 FROM user_ingredients ui
-                JOIN ingredients i ON ui.fdc_id = i.fdc_id
-                JOIN food_portion fp ON fp.fdc_id = i.fdc_id
+                JOIN ingredients i ON ui.id = i.id
+                JOIN food_portion fp ON fp.id = i.id
                 JOIN measure_unit mu ON fp.measure_unit_id = mu.id
                 WHERE ui.user_id = :user_id
-                GROUP BY i.fdc_id, i.description, mu.name
+                GROUP BY i.id, i.description, mu.name
                 """
             ), {"user_id": user_id}
         ).fetchall()
@@ -116,7 +116,7 @@ def get_user_ingredients(user_id: int = Path(...)):
         for ingredient in user_ingredients:
             ingredient_list.append(
                 IngredientAmount(
-                    ingredient_id=ingredient.fdc_id,
+                    ingredient_id=ingredient.id,
                     name=ingredient.name,
                     measure_unit=ingredient.measure_unit,
                     amount=ingredient.amount,
@@ -131,9 +131,9 @@ def remove_ingredient(ingredient: UserIngredient, user_id: int = Path(...)):
         connection.execute(
             sqlalchemy.text(
                 """
-                INSERT INTO user_ingredients (user_id, fdc_id, amount)
-                VALUES(:user_id, :fdc_id, :amount)
+                INSERT INTO user_ingredients (user_id, id, amount)
+                VALUES(:user_id, :id, :amount)
                 """
             ),
-            {"user_id": user_id, "fdc_id": ingredient.ingredient_id, "amount": -ingredient.amount},
+            {"user_id": user_id, "id": ingredient.ingredient_id, "amount": -ingredient.amount},
         )

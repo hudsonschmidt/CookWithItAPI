@@ -48,11 +48,11 @@ def search_ingredients(recipe_id: int = Path(...)):
         recipe = connection.execute(
             sqlalchemy.text(
                 """
-                SELECT DISTINCT r.name AS rname, r.steps, i.fdc_id, i.description AS iname, ra.amount, mu.name AS measuring_unit
+                SELECT DISTINCT r.name AS rname, r.steps, i.id, i.description AS iname, ra.amount, mu.name AS measuring_unit
                 FROM recipes AS r
                 JOIN recipe_amounts AS ra ON r.id = ra.recipe_id 
-                JOIN ingredients AS i ON ra.ingredient_id = i.fdc_id
-                JOIN food_portion AS fp ON fp.fdc_id = i.fdc_id
+                JOIN ingredients AS i ON ra.ingredient_id = i.id
+                JOIN food_portion AS fp ON fp.id = i.id
                 JOIN measure_unit AS mu ON mu.id = fp.measure_unit_id
                 WHERE r.id = :recipe_id
                 """
@@ -64,7 +64,7 @@ def search_ingredients(recipe_id: int = Path(...)):
         for ingredient in recipe:
             ingredient_list.append(
                 IngredientInfo(
-                    ingredient_id=ingredient.fdc_id,
+                    ingredient_id=ingredient.id,
                     name=ingredient.iname,
                     amount = ingredient.amount,
                     measure_unit=ingredient.measuring_unit,
