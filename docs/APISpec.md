@@ -124,7 +124,7 @@ Retrieves macro details for a specific meal.
 **Response**:
 ```json
 {
-  "meal_id": "412",
+  "meal_id": "424",
   "macros": {
     "protein": "20g",
     "carbs": "30g",
