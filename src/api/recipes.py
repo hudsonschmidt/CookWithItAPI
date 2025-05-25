@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Path
+from fastapi import APIRouter, Depends, Path, status, HTTPException
 from pydantic import BaseModel
 import sqlalchemy
 from src.api import auth
@@ -39,6 +39,10 @@ class RecipeTotals(BaseModel):
 
 class RecipeResponse(BaseModel):
     recipe_id: int
+
+class RemoveIngredientRequest(BaseModel):
+    recipe_id: int
+    ingredient_id: int
 
 
 @router.get("/search/{recipe_id}", response_model=RecipeTotals)
@@ -108,3 +112,21 @@ def create_recipe(recipe: Recipe):
         )
 
     return RecipeResponse(recipe_id=recipe_id)
+
+@router.delete("/remove-ingredient", status_code=status.HTTP_204_NO_CONTENT,)
+def remove_ingredient_from_recipe(request: RemoveIngredientRequest):
+    with db.engine.begin() as connection:
+        result = connection.execute(
+            sqlalchemy.text(
+                """
+                DELETE FROM recipe_amounts
+                WHERE recipe_id = :recipe_id AND ingredient_id = :ingredient_id
+                """
+            ),
+            {"recipe_id": request.recipe_id, "ingredient_id": request.ingredient_id}
+        )
+        if result.rowcount == 0:
+            raise HTTPException(
+                status_code=404,
+                detail="Ingredient does not exist for recipe.",
+            )
