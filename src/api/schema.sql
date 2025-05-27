@@ -8,8 +8,7 @@ CREATE TABLE public.food_portion (
 	gram_weight float4 NULL CHECK (gram_weight >= 0),
 	data_points float4 NULL CHECK (data_points >= 0),
 	footnote float4 NULL,
-	min_year_acquired float4 NULL CHECK (min_year_acquired >= 0),
-	PRIMARY KEY id
+	min_year_acquired float4 NULL CHECK (min_year_acquired >= 0)
 );
 
 
@@ -59,7 +58,7 @@ CREATE TABLE public.meal_recipes (
 	created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
 	CONSTRAINT meal_recipes_pkey PRIMARY KEY (id),
 	CONSTRAINT meal_recipes_meal_id_fkey FOREIGN KEY (meal_id) REFERENCES public.meal(id),
-	CONSTRAINT meal_recipes_recipe_id_fkey FOREIGN KEY (recipe_id) REFERENCES public.recipe(id),
+	CONSTRAINT meal_recipes_recipe_id_fkey FOREIGN KEY (recipe_id) REFERENCES public.recipe(id)
 );
 
 CREATE TABLE public.measure_unit (
@@ -96,7 +95,7 @@ INSERT INTO ingredients (id, data_type, description, food_category_id, publicati
 (748967, 'foundation_food', 'EGGS, GRADE A, LARGE, egg whole', 1, '2019-12-16');
 
 INSERT INTO measure_unit (id, name) VALUES
-(1099, 'egg')
+(1099, 'egg');
 
 INSERT INTO public.food_portion (id, seq_num, amount, measure_unit_id, portion_description, modifier, gram_weight, data_points, footnote, min_year_acquired)
 VALUES (1099, 748967, 1, 1, 1099, NULL, 'whole without shell', 50.3, 526, NULL, 2019);
@@ -154,4 +153,3 @@ INSERT INTO measure_unit (id, name) VALUES
 
 INSERT INTO food_portion (id, seq_num, amount, measure_unit_id, portion_description, modifier, gram_weight, data_points, footnote, min_year_acquired)
 VALUES (385662, 1, 1, 1102, NULL, NULL, 454, NULL, NULL, 2019);
-
