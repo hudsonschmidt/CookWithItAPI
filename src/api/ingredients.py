@@ -105,7 +105,7 @@ def get_user_ingredients(user_id: int = Path(...)):
                 JOIN ingredients i ON ui.id = i.id
                 JOIN food_portion fp ON fp.id = i.id
                 JOIN measure_unit mu ON fp.measure_unit_id = mu.id
-                WHERE ui.user_id = :user_id
+                WHERE ui.id = :user_id
                 GROUP BY i.id, i.description, mu.name
                 """
             ), {"user_id": user_id}

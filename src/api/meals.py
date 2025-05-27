@@ -103,7 +103,7 @@ def get_macros(meal_id: int):
                 JOIN 
                     nutrient ON nutrient.id = ingredient_nutrient.nutrient_id
                 WHERE 
-                    meal.id = :meal_id
+                    meals.id = :meal_id
                     AND nutrient.name IN ('Protein', 'Energy', 'Carbohydrates', 'Total lipid (fat)')
                     AND nutrient.unit_name IN ('G', 'KCAL')
                 GROUP BY 

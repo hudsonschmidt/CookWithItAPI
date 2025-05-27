@@ -53,7 +53,7 @@ def search_ingredients(recipe_id: int = Path(...)):
             sqlalchemy.text(
                 """
                 SELECT DISTINCT r.name AS rname, r.steps, i.id, i.description AS iname, ra.amount, mu.name AS measuring_unit
-                FROM recipes AS r
+                FROM recipe AS r
                 JOIN recipe_amounts AS ra ON r.id = ra.recipe_id 
                 JOIN ingredients AS i ON ra.ingredient_id = i.id
                 JOIN food_portion AS fp ON fp.id = i.id
@@ -130,3 +130,33 @@ def remove_ingredient_from_recipe(request: RemoveIngredientRequest):
                 status_code=404,
                 detail="Ingredient does not exist for recipe.",
             )
+        
+class MacroAmount(BaseModel):
+    macro_name: str
+    total_amount: float
+
+class MacroResponse(BaseModel):
+    macro_list: List[MacroAmount]
+
+class MacroGoalRequest(BaseModel):
+    protein: float
+    energy: float
+    carbs: float
+    fats: float
+
+@router.get("/macro-goal-recipes", response_model=dict[Recipe, int])
+def get_macro_goal_recipes(request: MacroGoalRequest):
+    with db.engine.begin() as connection:
+        result = connection.execute(
+            sqlalchemy.text(
+                """
+                
+                """,
+            ),
+            {
+                "protein": request.protein,
+                "energy": request.energy,
+                "carbs": request.carbs,
+                "fats": request.fats,
+            },
+        ).fetchall()
