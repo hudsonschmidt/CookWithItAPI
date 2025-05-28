@@ -111,6 +111,27 @@ Retrieves at most 10 recipes that the user can make based on current inventory o
 }
 ```
 
+### 2.4 Get Recipes that meet Macro Goals - `/recipes/macro-goal-recipes`
+
+Return every recipe that satisfies the requested macro goals with a 1x, 2x or 3x batch size
+
+**Request**: Path Parameter: `user_id`
+```json
+{
+  "protein": 100,
+  "energy": 200,
+  "carbs": 300,
+  "fats": 400
+}
+```
+
+**Response**:
+[
+  "pancakes": 3,
+  "waffles": 2, 
+  "eggs": 1 
+]
+
 ## 3. Meals (Macro Tracker)
 
 ### 3.1. Log Meal - `/meals` (POST)
