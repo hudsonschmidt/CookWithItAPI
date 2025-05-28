@@ -82,7 +82,7 @@ def search_ingredients(recipe_id: int = Path(...)):
 
 
 # looks at a user's ingredients and searches for recipes that they can make
-@router.get("/possible_recipe_search/{user_id}", response_model=RecipeList)
+@router.get("/possible-recipe-search/{user_id}", response_model=RecipeList)
 def possible_recipe_search(user_id: int = Path(...)):
     with db.engine.begin() as connection:
 

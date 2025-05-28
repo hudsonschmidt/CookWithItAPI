@@ -85,7 +85,7 @@ Retrieves details of a specific recipe including name, ingredients, and instruct
 }
 ```
 
-### 2.3 Get Posible Recipes - `/recipes/possible_recipe_search/{user_id}` (GET)
+### 2.3 Get Posible Recipes - `/recipes/possible-recipe-search/{user_id}` (GET)
 
 Retrieves at most 10 recipes that the user can make based on current inventory of ingredients 
 
