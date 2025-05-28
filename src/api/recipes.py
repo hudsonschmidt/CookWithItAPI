@@ -4,6 +4,7 @@ import sqlalchemy
 from src.api import auth
 from src import database as db
 from typing import List
+from collections import defaultdict
 
 router = APIRouter(
     prefix="/recipes",
@@ -144,19 +145,85 @@ class MacroGoalRequest(BaseModel):
     carbs: float
     fats: float
 
-@router.get("/macro-goal-recipes", response_model=dict[Recipe, int])
+# super duper complex endpoint am i right
+@router.post( 
+    "/macro-goal-recipes",
+    response_model=dict[str, int],
+    status_code=status.HTTP_200_OK,
+)
 def get_macro_goal_recipes(request: MacroGoalRequest):
+    """
+    Return every recipe that satisfies the requested macro goals with a
+    1x, 2x or 3x batch size
+    """
+    # avoid division by zero
+    if min(request.protein, request.energy, request.carbs, request.fats) <= 0:
+        raise HTTPException(
+            status_code=400,
+            detail="All macro goals must be > 0.",
+        )
+
     with db.engine.begin() as connection:
-        result = connection.execute(
+        # 1. aggregate macros for every recipe
+        recipes = connection.execute(
             sqlalchemy.text(
                 """
-                
-                """,
-            ),
-            {
-                "protein": request.protein,
-                "energy": request.energy,
-                "carbs": request.carbs,
-                "fats": request.fats,
-            },
+                WITH macro_per_recipe AS (
+                    SELECT
+                        r.id AS recipe_id,
+                        r.name AS recipe_name,
+                        r.steps AS steps,
+                        -- macros per recipe, scaled by the ingredient weight
+                        SUM(CASE WHEN n.name = 'Protein'THEN ra.amount * inut.amount / 100 ELSE 0 END) AS protein_g,
+                        SUM(CASE WHEN n.name = 'Energy' THEN ra.amount * inut.amount / 100 ELSE 0 END) AS energy_kcal,
+                        SUM(CASE WHEN n.name = 'Carbohydrate, by difference'THEN ra.amount * inut.amount / 100 ELSE 0 END) AS carbs_g,
+                        SUM(CASE WHEN n.name = 'Total lipid (fat)'THEN ra.amount * inut.amount / 100 ELSE 0 END) AS fats_g
+                    FROM recipe AS r
+                    JOIN recipe_amounts AS ra ON ra.recipe_id = r.id
+                    JOIN ingredient_nutrient AS inut ON inut.ingredient_id = ra.ingredient_id
+                    JOIN nutrient AS n ON n.id = inut.nutrient_id
+                    WHERE n.name IN (
+                        'Protein',
+                        'Energy',
+                        'Carbohydrate, by difference',
+                        'Total lipid (fat)'
+                    )
+                    GROUP BY r.id, r.name, r.steps
+                )
+                SELECT *
+                FROM macro_per_recipe
+                """
+            )
         ).fetchall()
+
+    # 2. determine which multiplier (1, 2, 3) – if any – meets the goals
+    good_recipes: dict[str, int] = {}
+
+    for row in recipes:
+        # Skip recipes that have a zero for any macro (missing data)
+        if 0 in (row.protein_g, row.energy_kcal, row.carbs_g, row.fats_g):
+            continue
+
+        # Largest ratio of goal/recipe => how much we need to scale
+        try:
+            ratio = max(
+                request.protein / row.protein_g,
+                request.energy  / row.energy_kcal,
+                request.carbs   / row.carbs_g,
+                request.fats    / row.fats_g,
+            )
+        except ZeroDivisionError:
+            continue
+
+        if ratio <= 1:
+            multiplier = 1
+        elif ratio <= 2:
+            multiplier = 2
+        elif ratio <= 3:
+            multiplier = 3
+        else:
+            continue
+
+        good_recipes[str(row.recipe_id)] = multiplier
+
+    return good_recipes

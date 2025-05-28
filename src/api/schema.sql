@@ -13,17 +13,20 @@ CREATE TABLE public.food_portion (
 
 
 CREATE TABLE public.ingredient_nutrient (
-        id int4 NOT NULL PRIMARY KEY,
-        nutrient_id int4 NULL,
-        amount float4 NULL CHECK (amount >= 0),
-        data_points float4 NULL CHECK (data_points >= 0),
-        derivation_id float4 NULL CHECK (derivation_id >= 0),
-        min_value float4 NULL CHECK (min_value >= 0),
-        max_value float4 NULL CHECK (max_value >= 0),
-        median float4 NULL CHECK (median >= 0),
-        footnote float4 NULL,
-        min_year_acquired float4 NULL CHECK (min_year_acquired >= 0)
+        id             int4  GENERATED ALWAYS AS IDENTITY  PRIMARY KEY,
+        ingredient_id  int4  NOT NULL REFERENCES public.ingredients(id),
+        nutrient_id    int4  NOT NULL REFERENCES public.nutrient(id),
+        amount         float4 NOT NULL CHECK (amount >= 0),
+        data_points    float4 CHECK (data_points >= 0),
+        derivation_id  float4 CHECK (derivation_id >= 0),
+        min_value      float4 CHECK (min_value >= 0),
+        max_value      float4 CHECK (max_value >= 0),
+        median         float4 CHECK (median >= 0),
+        footnote       float4,
+        min_year_acquired float4 CHECK (min_year_acquired >= 0),
+        CONSTRAINT uq_ingredient_nutrient UNIQUE (ingredient_id, nutrient_id)
 );
+
 
 CREATE TABLE public.ingredients (
         id int4 NOT NULL PRIMARY KEY,
@@ -105,21 +108,16 @@ INSERT INTO nutrient (id, name, unit_name, nutrient_nbr, rank) VALUES
 (1004, 'Total lipid (fat)', 'G', NULL, NULL);
 
 INSERT INTO ingredient_nutrient (
-    id,
-    nutrient_id,
-    amount,
-    data_points,
-    derivation_id,
-    min_value,
-    max_value,
-    median,
-    footnote,
-    min_year_acquired
+    id, ingredient_id, nutrient_id,
+    amount, data_points, derivation_id,
+    min_value, max_value, median,
+    footnote, min_year_acquired
 ) VALUES
-(748962, 1008, 148, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(748961, 1003, 12.4, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(748964, 1005, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-(748963, 1004, 9.96, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+(748962, 748967, 1008, 148,  NULL, NULL, NULL, NULL, NULL, NULL, NULL),  -- Energy
+(748961, 748967, 1003, 12.4, NULL, NULL, NULL, NULL, NULL, NULL, NULL),  -- Protein
+(748964, 748967, 1005, 2,    NULL, NULL, NULL, NULL, NULL, NULL, NULL),  -- Carbs
+(748963, 748967, 1004, 9.96, NULL, NULL, NULL, NULL, NULL, NULL, NULL);  -- Fat
+
 
 
 -- Insert black beans
