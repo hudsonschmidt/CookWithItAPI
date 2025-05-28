@@ -85,6 +85,32 @@ Retrieves details of a specific recipe including name, ingredients, and instruct
 }
 ```
 
+### 2.3 Get Posible Recipes - `/recipes/possible_recipe_search/{user_id}` (GET)
+
+Retrieves at most 10 recipes that the user can make based on current inventory of ingredients 
+
+**Request**: Path Parameter: `user_id`
+
+**Response**:
+```json
+{
+  "recipes": [
+    {
+      "recipe_id": "456",
+      "name": "Pancakes",
+      "ingredients": [ ... ],
+      "steps ": "..."
+    }
+    {
+      "recipe_id": "789",
+      "name": "Waffles",
+      "ingredients": [ ... ],
+      "steps": "..."
+    }
+  ]
+}
+```
+
 ## 3. Meals (Macro Tracker)
 
 ### 3.1. Log Meal - `/meals` (POST)

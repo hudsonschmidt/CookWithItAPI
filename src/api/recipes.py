@@ -45,6 +45,8 @@ class RemoveIngredientRequest(BaseModel):
     recipe_id: int
     ingredient_id: int
 
+class RecipeList(BaseModel):
+    recipes: List[RecipeTotals]
 
 @router.get("/search/{recipe_id}", response_model=RecipeTotals)
 def search_ingredients(recipe_id: int = Path(...)):
@@ -78,6 +80,90 @@ def search_ingredients(recipe_id: int = Path(...)):
 
         return RecipeTotals(recipe_id=recipe_id, name=recipe[0].rname, steps=recipe[0].steps, ingredients_list=ingredient_list)
 
+
+# looks at a user's ingredients and searches for recipes that they can make
+@router.get("/possible_recipe_search/{user_id}", response_model=RecipeList)
+def possible_recipe_search(user_id: int = Path(...)):
+    with db.engine.begin() as connection:
+
+        recipe = connection.execute(
+            sqlalchemy.text(
+                """
+                WITH user_ingredients AS (
+                    SELECT 
+                        SUM(ui.amount) AS amount, 
+                        ui.ingredient_id AS id
+                    FROM user_ingredients AS ui
+                    WHERE ui.user_id = :user_id
+                    GROUP BY ui.ingredient_id
+                ),
+
+                ingredient_match AS (
+                    SELECT ra.recipe_id, ra.ingredient_id, CASE WHEN ui.amount >= ra.amount THEN 1 ELSE 0 END AS has_enough_ingredient
+                    FROM recipe_amounts AS ra
+                    JOIN user_ingredients AS ui ON ui.id = ra.ingredient_id
+                    GROUP BY ra.recipe_id, ra.ingredient_id, ui.amount, ra.amount
+                ),
+
+                recipe_match AS (
+                    SELECT r.id, MIN(im.has_enough_ingredient) AS has_enough_recipe
+                    FROM recipe AS r
+                    JOIN ingredient_match AS im ON r.id = im.recipe_id
+                    GROUP BY r.id
+                    HAVING MIN(im.has_enough_ingredient) = 1
+                    LIMIT 10
+                )
+
+                SELECT DISTINCT r.id AS rid, r.name AS rname, r.steps, i.id AS iid, i.description AS iname, ra.amount, mu.name AS measuring_unit
+                FROM recipe AS r
+                JOIN recipe_match AS rm ON rm.id = r.id
+                JOIN recipe_amounts AS ra ON r.id = ra.recipe_id 
+                JOIN ingredients AS i ON ra.ingredient_id = i.id
+                JOIN food_portion AS fp ON fp.id = i.id
+                JOIN measure_unit AS mu ON mu.id = fp.measure_unit_id
+                GROUP BY r.id, i.id, ra.amount, mu.name
+                """
+            ),{"user_id": user_id}
+        ).fetchall()
+
+        if len(recipe) == 0:
+            return []
+
+        recipes = []
+        cur_id = recipe[0].rid
+        cur_name = recipe[0].rname
+        cur_steps = recipe[0].steps 
+        cur_ingredients = []
+
+        for row in recipe:
+            if cur_id == row.rid:
+                cur_ingredients.append(IngredientInfo(
+                    ingredient_id = row.iid,
+                    name = row.iname,
+                    amount = row.amount,
+                    measure_unit = row.measuring_unit
+                ))
+            else:
+                recipes.append(RecipeTotals(
+                    recipe_id = cur_id,
+                    name = cur_name,
+                    steps = cur_steps,
+                    ingredients_list = cur_ingredients
+                ))
+
+                cur_id = row.rid
+                cur_name = row.rname
+                cur_steps = row.steps 
+                cur_ingredients = []
+        
+        recipes.append(RecipeTotals(
+                    recipe_id = cur_id,
+                    name = cur_name,
+                    steps = cur_steps,
+                    ingredients_list = cur_ingredients
+                ))
+
+        return RecipeList(recipes = recipes)
 
 @router.post("/add-recipe", response_model=RecipeResponse)
 def create_recipe(recipe: Recipe):

@@ -81,11 +81,11 @@ def add_ingredient_by_id(ingredient: UserIngredient, user_id: int = Path(...)):
         connection.execute(
             sqlalchemy.text(
                 """
-                INSERT INTO user_ingredients (user_id, id, amount)
-                VALUES(:user_id, :id, :amount)
+                INSERT INTO user_ingredients (user_id, ingredient_id, amount)
+                VALUES(:user_id, :ingredient_id, :amount)
                 """
             ),
-            {"user_id": user_id, "id": ingredient.ingredient_id, "amount": ingredient.amount},
+            {"user_id": user_id, "ingredient_id": ingredient.ingredient_id, "amount": ingredient.amount},
         )
 
 
@@ -102,10 +102,10 @@ def get_user_ingredients(user_id: int = Path(...)):
                     i.description AS name, 
                     mu.name AS measure_unit
                 FROM user_ingredients ui
-                JOIN ingredients i ON ui.id = i.id
+                JOIN ingredients i ON ui.ingredient_id = i.id
                 JOIN food_portion fp ON fp.id = i.id
                 JOIN measure_unit mu ON fp.measure_unit_id = mu.id
-                WHERE ui.id = :user_id
+                WHERE ui.user_id = :user_id
                 GROUP BY i.id, i.description, mu.name
                 """
             ), {"user_id": user_id}
@@ -131,9 +131,9 @@ def remove_ingredient(ingredient: UserIngredient, user_id: int = Path(...)):
         connection.execute(
             sqlalchemy.text(
                 """
-                INSERT INTO user_ingredients (user_id, id, amount)
-                VALUES(:user_id, :id, :amount)
+                INSERT INTO user_ingredients (user_id, ingredient_id, amount)
+                VALUES(:user_id, :ingredient_id, :amount)
                 """
             ),
-            {"user_id": user_id, "id": ingredient.ingredient_id, "amount": -ingredient.amount},
+            {"user_id": user_id, "ingredient_id": ingredient.ingredient_id, "amount": -ingredient.amount},
         )
