@@ -105,6 +105,8 @@ INSERT INTO nutrient (id, name, unit_name, nutrient_nbr, rank) VALUES
 (1008, 'Energy', 'KCAL', NULL, NULL),
 (1003, 'Protein', 'G', NULL, NULL),
 (1004, 'Total lipid (fat)', 'G', NULL, NULL);
+(1005, 'Carbohydrates', 'G', NULL, NULL);
+
 
 INSERT INTO ingredient_nutrient (
     id,
@@ -121,6 +123,7 @@ INSERT INTO ingredient_nutrient (
 (748967, 1008, 148, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (748967, 1003, 12.4, NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 (748967, 1004, 9.96, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+(748967, 1005, 0.12, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 
 -- Insert black beans
