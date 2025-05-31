@@ -76,16 +76,17 @@ def search_ingredients(search_term: str):
 
 
 @router.post("/{user_id}/add-ingredients/", status_code=status.HTTP_204_NO_CONTENT)
-def add_ingredient_by_id(ingredient: UserIngredient, user_id: int = Path(...)):
+def add_ingredient_by_id(call_id:int, ingredient: UserIngredient, user_id: int = Path(...)):
     with db.engine.begin() as connection:
         connection.execute(
             sqlalchemy.text(
                 """
-                INSERT INTO user_ingredients (user_id, ingredient_id, amount)
-                VALUES(:user_id, :ingredient_id, :amount)
+                INSERT INTO user_ingredients (id, user_id, ingredient_id, amount)
+                VALUES(:call_id, :user_id, :ingredient_id, :amount)
+                ON CONFLICT DO NOTHING
                 """
             ),
-            {"user_id": user_id, "ingredient_id": ingredient.ingredient_id, "amount": ingredient.amount},
+            {"call_id": call_id, "user_id": user_id, "ingredient_id": ingredient.ingredient_id, "amount": ingredient.amount},
         )
 
 
@@ -126,14 +127,15 @@ def get_user_ingredients(user_id: int = Path(...)):
         return IngredientAmounts(results=ingredient_list)
 
 @router.delete("/{user_id}/remove-ingredients/", status_code=status.HTTP_204_NO_CONTENT)
-def remove_ingredient(ingredient: UserIngredient, user_id: int = Path(...)):
+def remove_ingredient(call_id: int, ingredient: UserIngredient, user_id: int = Path(...)):
     with db.engine.begin() as connection:
         connection.execute(
             sqlalchemy.text(
                 """
-                INSERT INTO user_ingredients (user_id, ingredient_id, amount)
-                VALUES(:user_id, :ingredient_id, :amount)
+                INSERT INTO user_ingredients (id, user_id, ingredient_id, amount)
+                VALUES(:api_id, :user_id, :ingredient_id, :amount)
+                ON CONFLICT DO NOTHING
                 """
             ),
-            {"user_id": user_id, "ingredient_id": ingredient.ingredient_id, "amount": -ingredient.amount},
+            {"call_id": call_id, "user_id": user_id, "ingredient_id": ingredient.ingredient_id, "amount": -ingredient.amount},
         )

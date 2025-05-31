@@ -83,6 +83,8 @@ CREATE TABLE public.recipe_amounts (
 
 CREATE TABLE public.user_ingredients (
         id int4 NOT NULL PRIMARY KEY,
+        user_id int4 NOT NULL,
+        ingredient_id int4 NOT NULL,
         amount int4 NULL CHECK (amount >= 0),
         "description" text NULL,
         measure_unit_name text NULL,
