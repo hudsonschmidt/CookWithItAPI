@@ -1,4 +1,21 @@
-### Write up of how many rows of data we have and also why we think the service would scale in this way.
+### Fake Data Modeling Writeup
+
+#### Row Counts Per Table
+
+* **ingredients:** 1,052,112 rows
+* **food\_portion:** 1,021,112 rows
+* **ingredient\_nutrient:** 4,208,432 rows
+* **user\_ingredients:** 163,936 rows
+
+#### Data Scaling Justification
+
+Our data model is designed to mirror the relationships and expected scaling in a real-world food and nutrition tracking service:
+
+* **ingredient\_nutrient** has the largest number of rows (over 4.2 million) because each ingredient can be associated with multiple nutrients. This many-to-many relationship means that as the number of ingredients increases, the number of ingredient\_nutrient rows grows even faster, reflecting real-world complexity where every new ingredient potentially brings 3–10+ new nutrient records.
+* **ingredients** and **food\_portion** tables each have about a million rows. Each food item typically has a unique portion entry, leading to a roughly 1:1 ratio here, which aligns with how food databases scale—every unique food (ingredient) needs at least one defined portion.
+* **user\_ingredients** has fewer rows (about 164k), but this number would increase significantly with more users and as each user adds more ingredients to their household or personal inventory. We expect this table to scale rapidly as user adoption increases.
+
+This approach provides a realistic distribution across tables, simulating a real application's growth where the linking (ingredient\_nutrient) and user-driven (user\_ingredients) tables naturally become the largest.
 
 ---
 
