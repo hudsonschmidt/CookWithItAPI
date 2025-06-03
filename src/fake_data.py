@@ -32,7 +32,7 @@ def random_id(existing):
             existing.add(new_id)
             return new_id
 
-def main():
+def main(number):
     fake = Faker()
     metadata = MetaData()
 
@@ -69,7 +69,7 @@ def main():
                                 Column('nutrient_id', Integer),
                                 Column('amount', Float))
 
-    N = int(input("How many ingredients do you want to create? "))
+    N = number
     now_date = datetime.now().date()
 
     used_ids = set()
@@ -83,11 +83,11 @@ def main():
         measure_unit_rows.append({'id': mu_id, 'name': name})
 
     with engine.connect() as conn:
-        # Insert measure units with ON CONFLICT DO NOTHING
-        stmt = insert(measure_unit).values(measure_unit_rows)
-        stmt = stmt.on_conflict_do_nothing(index_elements=['id'])
-        conn.execute(stmt)
-        print(f"Inserted {len(measure_unit_rows)} measure units (skipping conflicts).")
+        # # Insert measure units with ON CONFLICT DO NOTHING
+        # stmt = insert(measure_unit).values(measure_unit_rows)
+        # stmt = stmt.on_conflict_do_nothing(index_elements=['id'])
+        # conn.execute(stmt)
+        # print(f"Inserted {len(measure_unit_rows)} measure units (skipping conflicts).")
 
         ingredient_rows = []
         food_portion_rows = []
@@ -159,5 +159,17 @@ def main():
         conn.commit()
     print(f"Inserted {N} ingredients, {N} portions, {4*N} nutrients.")
 
+
+import time
 if __name__ == '__main__':
-    main()
+    number = 1000
+    for i in range(1,100):
+        time.sleep(1)
+        try:
+            main(number)
+        except Exception as e:
+            print(f"Attempt {i+1} failed: {e}")
+            if i == 2:
+                raise e
+            else:
+                print("Retrying...")

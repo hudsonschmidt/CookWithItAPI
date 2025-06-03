@@ -171,7 +171,7 @@ def create_recipe(recipe: Recipe):
         result = connection.execute(
             sqlalchemy.text(
                 """
-                INSERT INTO recipes (name, steps)
+                INSERT INTO recipe (name, steps)
                 VALUES (:name, :steps)
                 RETURNING id;
                 """
@@ -259,25 +259,43 @@ def get_macro_goal_recipes(request: MacroGoalRequest):
                         r.id AS recipe_id,
                         r.name AS recipe_name,
                         r.steps AS steps,
-                        -- macros per recipe, scaled by the ingredient weight
-                        SUM(CASE WHEN n.name = 'Protein'THEN ra.amount * inut.amount / 100 ELSE 0 END) AS protein_g,
-                        SUM(CASE WHEN n.name = 'Energy' THEN ra.amount * inut.amount / 100 ELSE 0 END) AS energy_kcal,
-                        SUM(CASE WHEN n.name = 'Carbohydrate, by difference'THEN ra.amount * inut.amount / 100 ELSE 0 END) AS carbs_g,
-                        SUM(CASE WHEN n.name = 'Total lipid (fat)'THEN ra.amount * inut.amount / 100 ELSE 0 END) AS fats_g
+
+                        SUM(
+                            CASE 
+                                WHEN n.name = 'Protein' THEN ra.amount * inut.amount / 100
+                                ELSE 0
+                            END
+                        ) AS protein_g,
+
+                        SUM(
+                            CASE 
+                                WHEN n.name = 'Energy' THEN ra.amount * inut.amount / 100
+                                ELSE 0
+                            END
+                        ) AS energy_kcal,
+
+                        SUM(
+                            CASE 
+                                WHEN n.name = 'Carbohydrate, by difference' THEN ra.amount * inut.amount / 100
+                                ELSE 0
+                            END
+                        ) AS carbs_g,
+
+                        SUM(
+                            CASE 
+                                WHEN n.name = 'Total lipid (fat)' THEN ra.amount * inut.amount / 100
+                                ELSE 0
+                            END
+                        ) AS fats_g
                     FROM recipe AS r
-                    JOIN recipe_amounts AS ra ON ra.recipe_id = r.id
-                    JOIN ingredient_nutrient AS inut ON inut.ingredient_id = ra.ingredient_id
-                    JOIN nutrient AS n ON n.id = inut.nutrient_id
-                    WHERE n.name IN (
-                        'Protein',
-                        'Energy',
-                        'Carbohydrate, by difference',
-                        'Total lipid (fat)'
-                    )
+                    LEFT JOIN recipe_amounts AS ra ON ra.recipe_id = r.id
+                    LEFT JOIN ingredient_nutrient AS inut ON inut.ingredient_id = ra.ingredient_id
+                    LEFT JOIN nutrient AS n ON n.id = inut.nutrient_id
                     GROUP BY r.id, r.name, r.steps
                 )
                 SELECT *
                 FROM macro_per_recipe
+                ORDER BY recipe_id;
                 """
             )
         ).fetchall()
