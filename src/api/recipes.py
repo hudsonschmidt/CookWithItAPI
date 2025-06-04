@@ -6,6 +6,8 @@ from src import database as db
 from typing import List
 from collections import defaultdict
 
+from .ingredients import remove_ingredient, UserIngredient
+
 router = APIRouter(
     prefix="/recipes",
     tags=["recipes"],
@@ -98,7 +100,34 @@ def search_recipes(recipe_id: int = Path(...)):
             name=recipe_name,
             steps=recipe_steps,
             ingredients_list=ingredient_list,
-        )
+        ).fetchone()
+
+
+@router.get("/eat/{recipe_id}", status_code=status.HTTP_204_NO_CONTENT)
+def eat_recipe(call_id: int, user_id: int, recipe_id: int = Path(...)):
+    with db.engine.begin() as connection:
+        rows = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT 
+                i.id AS ingredient_id,
+                ra.amount AS amount
+                FROM recipe_amounts AS ra
+                JOIN ingredients AS i ON ra.ingredient_id = i.id
+                WHERE ra.recipe_id = :recipe_id
+                """
+            ),{"recipe_id": recipe_id}
+        ).fetchall()
+
+        if rows is None:
+            raise HTTPException(status_code=404, detail="Recipe not found")
+
+        for row in rows: 
+            remove_ingredient(call_id, UserIngredient(
+                ingredient_id = row.ingredient_id,
+                amount = row.amount
+            ), user_id )
+            call_id += 1
 
 
 # looks at a user's ingredients and searches for recipes that they can make
