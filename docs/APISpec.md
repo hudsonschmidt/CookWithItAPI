@@ -43,6 +43,20 @@ Removes an ingredient from the user's list.
 
 **Response**: `204 No Content`
 
+### 1.3. Set Ingredient - `/user-ingredients/{uiid}` (DELETE)
+
+sets a user ingredient to a certian amount
+
+**Request**:
+```json
+{
+  "ingredient_id": "ingredient_id"
+}
+```
+
+**Response**: `204 No Content`
+
+
 ## 2. Recipes
 
 ### 2.1. Create Recipe - `/recipes` (POST)

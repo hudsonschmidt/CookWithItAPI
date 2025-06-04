@@ -129,13 +129,56 @@ def get_user_ingredients(user_id: int = Path(...)):
 @router.delete("/{user_id}/remove-ingredients/", status_code=status.HTTP_204_NO_CONTENT)
 def remove_ingredient(call_id: int, ingredient: UserIngredient, user_id: int = Path(...)):
     with db.engine.begin() as connection:
+        cur_amount = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT SUM(ui.amount) AS amount
+                FROM user_ingredients ui
+                WHERE ui.user_id = :user_id AND ui.ingredient_id = :ingredient_id
+                """
+            ), {"user_id": user_id, "ingredient_id": ingredient.ingredient_id}
+        ).scalar()
+
+        if cur_amount is None:
+            return
+
         connection.execute(
             sqlalchemy.text(
                 """
                 INSERT INTO user_ingredients (id, user_id, ingredient_id, amount)
-                VALUES(:api_id, :user_id, :ingredient_id, :amount)
+                VALUES(:call_id, :user_id, :ingredient_id, :amount)
                 ON CONFLICT DO NOTHING
                 """
             ),
-            {"call_id": call_id, "user_id": user_id, "ingredient_id": ingredient.ingredient_id, "amount": -ingredient.amount},
+            {"call_id": call_id, "user_id": user_id, "ingredient_id": ingredient.ingredient_id, "amount": max(-ingredient.amount, -cur_amount)},
+        )
+
+@router.put("/{user_id}/set-ingredients/", status_code=status.HTTP_204_NO_CONTENT)
+def set_ingredient(call_id: int, ingredient: UserIngredient, user_id: int = Path(...)):
+    with db.engine.begin() as connection:
+        cur_amount = connection.execute(
+            sqlalchemy.text(
+                """
+                SELECT SUM(ui.amount) AS amount
+                FROM user_ingredients ui
+                WHERE ui.user_id = :user_id AND ui.ingredient_id = :ingredient_id
+                """
+            ), {"user_id": user_id, "ingredient_id": ingredient.ingredient_id}
+        ).scalar()
+
+        amount = 0
+        if cur_amount is None:
+            amount = ingredient.amount
+        else:
+            amount = ingredient.amount - cur_amount
+
+        connection.execute(
+            sqlalchemy.text(
+                """
+                INSERT INTO user_ingredients (id, user_id, ingredient_id, amount)
+                VALUES(:call_id, :user_id, :ingredient_id, :amount)
+                ON CONFLICT DO NOTHING
+                """
+            ),
+            {"call_id": call_id, "user_id": user_id, "ingredient_id": ingredient.ingredient_id, "amount": amount},
         )

@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from src.api import (
     ingredients,
     recipes,
-    meals
+    meals,
+    user
 )
 from starlette.middleware.cors import CORSMiddleware
 
@@ -21,6 +22,11 @@ tags_metadata = [
     {
         "name": "meals",
         "description": "A meal houses foods per a given day and meal type.",
+    },
+
+    {
+        "name": "user",
+        "description": "Creates a User",
     },
 ]
 
@@ -45,6 +51,7 @@ app.add_middleware(
 app.include_router(ingredients.router)
 app.include_router(recipes.router)
 app.include_router(meals.router)
+app.include_router(user.router)
 
 @app.get("/")
 async def root():

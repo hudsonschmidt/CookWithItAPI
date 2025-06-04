@@ -101,7 +101,7 @@ def possible_recipe_search(user_id: int = Path(...)):
                 ingredient_match AS (
                     SELECT ra.recipe_id, ra.ingredient_id, CASE WHEN ui.amount >= ra.amount THEN 1 ELSE 0 END AS has_enough_ingredient
                     FROM recipe_amounts AS ra
-                    JOIN user_ingredients AS ui ON ui.id = ra.ingredient_id
+                    LEFT JOIN user_ingredients AS ui ON ui.id = ra.ingredient_id
                     GROUP BY ra.recipe_id, ra.ingredient_id, ui.amount, ra.amount
                 ),
 
@@ -127,7 +127,7 @@ def possible_recipe_search(user_id: int = Path(...)):
         ).fetchall()
 
         if len(recipe) == 0:
-            return []
+            return RecipeList(recipes=[])
 
         recipes = []
         cur_id = recipe[0].rid
@@ -154,7 +154,12 @@ def possible_recipe_search(user_id: int = Path(...)):
                 cur_id = row.rid
                 cur_name = row.rname
                 cur_steps = row.steps 
-                cur_ingredients = []
+                cur_ingredients = [IngredientInfo(
+                    ingredient_id=row.iid,
+                    name=row.iname,
+                    amount=row.amount,
+                    measure_unit=row.measuring_unit
+                    )]
         
         recipes.append(RecipeTotals(
                     recipe_id = cur_id,
@@ -162,7 +167,7 @@ def possible_recipe_search(user_id: int = Path(...)):
                     steps = cur_steps,
                     ingredients_list = cur_ingredients
                 ))
-
+            
         return RecipeList(recipes = recipes)
 
 @router.post("/add-recipe", response_model=RecipeResponse)
