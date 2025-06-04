@@ -49,36 +49,56 @@ class RecipeList(BaseModel):
     recipes: List[RecipeTotals]
 
 @router.get("/search/{recipe_id}", response_model=RecipeTotals)
-def search_ingredients(recipe_id: int = Path(...)):
+def search_recipes(recipe_id: int = Path(...)):
     with db.engine.begin() as connection:
-        # Get ingredients from a given recipe
-        recipe = connection.execute(
-            sqlalchemy.text(
-                """
-                SELECT DISTINCT r.name AS rname, r.steps, i.id, i.description AS iname, ra.amount, mu.name AS measuring_unit
+        row = connection.execute(
+            sqlalchemy.text("""
+                SELECT r.name AS rname, r.steps
                 FROM recipe AS r
-                JOIN recipe_amounts AS ra ON r.id = ra.recipe_id 
+                WHERE r.id = :recipe_id
+            """),
+            {"recipe_id": recipe_id},
+        ).fetchone()
+
+        if row is None:
+            raise HTTPException(status_code=404, detail="Recipe not found")
+
+        recipe_name = row.rname
+        recipe_steps = row.steps
+
+        ingredient_rows = connection.execute(
+            sqlalchemy.text("""
+                SELECT 
+                    i.id AS ingredient_id,
+                    i.description AS iname,
+                    ra.amount,
+                    mu.name AS measuring_unit
+                FROM recipe_amounts AS ra
                 JOIN ingredients AS i ON ra.ingredient_id = i.id
                 JOIN food_portion AS fp ON fp.id = i.id
                 JOIN measure_unit AS mu ON mu.id = fp.measure_unit_id
-                WHERE r.id = :recipe_id
-                """
-            ),{"recipe_id": recipe_id}
+                WHERE ra.recipe_id = :recipe_id
+            """),
+            {"recipe_id": recipe_id},
         ).fetchall()
 
-        # Return list of ingredients
         ingredient_list: List[IngredientInfo] = []
-        for ingredient in recipe:
+        for ing in ingredient_rows:
             ingredient_list.append(
                 IngredientInfo(
-                    ingredient_id=ingredient.id,
-                    name=ingredient.iname,
-                    amount = ingredient.amount,
-                    measure_unit=ingredient.measuring_unit,
+                    ingredient_id=ing.ingredient_id,
+                    name=ing.iname,
+                    amount=ing.amount,
+                    measure_unit=ing.measuring_unit,
                 )
             )
 
-        return RecipeTotals(recipe_id=recipe_id, name=recipe[0].rname, steps=recipe[0].steps, ingredients_list=ingredient_list)
+        return RecipeTotals(
+            recipe_id=recipe_id,
+            name=recipe_name,
+            steps=recipe_steps,
+            ingredients_list=ingredient_list,
+        )
 
 
 # looks at a user's ingredients and searches for recipes that they can make
