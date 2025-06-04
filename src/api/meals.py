@@ -129,7 +129,7 @@ def get_macros(meal_id: int):
 @router.get("/history/", response_model=MealSearchResponse)
 def meal_history(start: str, end: str):
     """
-    Queries all meals logged from date range given start to end.
+    Queries all meals logged from date range given start to end in yyyy-mm-dd format.
     """
     with db.engine.begin() as connection:
         # Query meal by date
@@ -151,7 +151,7 @@ def meal_history(start: str, end: str):
         for meal in meals:
             meal_list.append(
                 Meal(
-                    id=meal.id,
+                    meal_id=meal.id,
                     meal_type=meal.mealtime,
                     date=meal.date,
                 )
