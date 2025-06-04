@@ -64,7 +64,7 @@ def search_recipes(recipe_id: int = Path(...)):
                 WHERE r.id = :recipe_id
                 """
             ),{"recipe_id": recipe_id}
-        ).fetchall()
+        ).fetchone()
 
         # Return list of ingredients
         ingredient_list: List[IngredientInfo] = []
