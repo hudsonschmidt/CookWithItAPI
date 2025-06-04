@@ -49,7 +49,7 @@ class RecipeList(BaseModel):
     recipes: List[RecipeTotals]
 
 @router.get("/search/{recipe_id}", response_model=RecipeTotals)
-def search_ingredients(recipe_id: int = Path(...)):
+def search_recipes(recipe_id: int = Path(...)):
     with db.engine.begin() as connection:
         # Get ingredients from a given recipe
         recipe = connection.execute(
@@ -78,7 +78,7 @@ def search_ingredients(recipe_id: int = Path(...)):
                 )
             )
 
-        return RecipeTotals(recipe_id=recipe_id, name=recipe[0].rname, steps=recipe[0].steps, ingredients_list=ingredient_list)
+        return RecipeTotals(recipe_id=recipe_id, name=recipe.rname, steps=recipe.steps, ingredients_list=ingredient_list)
 
 
 # looks at a user's ingredients and searches for recipes that they can make
